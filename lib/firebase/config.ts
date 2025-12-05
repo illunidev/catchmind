@@ -16,6 +16,12 @@ const firebaseConfig = {
   appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID,
 };
 
+// 환경변수 검증
+if (!firebaseConfig.databaseURL) {
+  console.error('Firebase databaseURL이 설정되지 않았습니다. .env.local 파일을 확인하세요.');
+  throw new Error('NEXT_PUBLIC_FIREBASE_DATABASE_URL is required');
+}
+
 // Firebase 앱 초기화 (중복 초기화 방지)
 let app: FirebaseApp;
 if (!getApps().length) {

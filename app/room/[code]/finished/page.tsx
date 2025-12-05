@@ -1,0 +1,99 @@
+/**
+ * Finished Room Page
+ * 게임 종료 페이지 - /room/[code]/finished
+ */
+
+'use client';
+
+import { useEffect } from 'react';
+import { useRouter, useParams } from 'next/navigation';
+import { useUser } from '@/lib/domains/user/hooks/useUser';
+import { useRoom } from '@/lib/domains/room/hooks/useRoom';
+import { useGame } from '@/lib/domains/game/hooks/useGame';
+import { roomService } from '@/lib/domains/room/services/roomService';
+import { chatService } from '@/lib/domains/chat/services/chatService';
+import { RoomHeader } from '@/components/game/RoomHeader';
+import { GameFinishedRoom } from '@/components/game/GameFinishedRoom';
+import { Loading } from '@/components/shared/Loading';
+
+export default function FinishedRoomPage() {
+  const router = useRouter();
+  const params = useParams();
+  const roomCode = params.code as string;
+  const { user, loading: userLoading } = useUser();
+  const { room, players, loading: roomLoading } = useRoom(roomCode, user?.id);
+  const { gameState } = useGame(roomCode);
+
+  // 로그인 체크
+  useEffect(() => {
+    if (!userLoading && !user) {
+      router.push('/');
+    }
+  }, [user, userLoading, router]);
+
+  // 방 유효성 체크
+  useEffect(() => {
+    if (!roomCode) return;
+    if (roomLoading) return;
+
+    if (!room) {
+      alert('존재하지 않는 방입니다.');
+      router.push('/');
+    }
+  }, [room, roomLoading, roomCode, router]);
+
+  // 게임 상태 체크
+  useEffect(() => {
+    if (!gameState) {
+      router.push(`/room/${roomCode}/waiting`);
+    } else if (gameState.status !== 'finished') {
+      router.push(`/room/${roomCode}/playing`);
+    }
+  }, [gameState, roomCode, router]);
+
+  if (userLoading || roomLoading || !user || !room) {
+    return (
+      <main className="flex min-h-screen items-center justify-center">
+        <Loading text="로딩 중..." />
+      </main>
+    );
+  }
+
+  const currentPlayer = players.find((p) => p.userId === user.id);
+  const isHost = currentPlayer?.isHost || false;
+
+  const handleBackToLobby = async () => {
+    try {
+      await roomService.leaveRoom(user.id, roomCode);
+      await chatService.sendSystemMessage(roomCode, `${user.nickname}님이 방을 나갔습니다.`);
+      router.push('/');
+    } catch (err) {
+      console.error('방 나가기 실패:', err);
+      router.push('/');
+    }
+  };
+
+  const handleLeaveRoom = async () => {
+    try {
+      await roomService.leaveRoom(user.id, roomCode);
+      await chatService.sendSystemMessage(roomCode, `${user.nickname}님이 방을 나갔습니다.`);
+      router.push('/');
+    } catch (err) {
+      console.error('방 나가기 실패:', err);
+    }
+  };
+
+  return (
+    <main className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 p-8">
+      <div className="max-w-7xl mx-auto space-y-4">
+        <RoomHeader room={room} onLeave={handleLeaveRoom} />
+
+        <GameFinishedRoom
+          players={players}
+          isHost={isHost}
+          onBackToLobby={handleBackToLobby}
+        />
+      </div>
+    </main>
+  );
+}

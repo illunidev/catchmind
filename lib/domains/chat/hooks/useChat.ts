@@ -31,9 +31,10 @@ export function useChat({ roomCode, userId, nickname }: UseChatOptions) {
     });
 
     // 새 메시지 리스너
-    const unsubscribe = listenToChildAdded<ChatMessage>(
+    const unsubscribe = listenToChildAdded(
       `chats/${roomCode}`,
-      (message) => {
+      (snapshot) => {
+        const message = snapshot.val() as ChatMessage | null;
         if (message) {
           setMessages((prev) => {
             // 중복 방지

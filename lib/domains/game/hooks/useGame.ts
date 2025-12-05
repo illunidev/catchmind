@@ -20,9 +20,10 @@ export function useGame(roomCode: string) {
   useEffect(() => {
     if (!roomCode) return;
 
-    const unsubscribe = listenToValue<GameState>(
+    const unsubscribe = listenToValue(
       `gameStates/${roomCode}`,
-      (data) => {
+      (snapshot) => {
+        const data = snapshot.val() as GameState | null;
         setGameState(data);
         setLoading(false);
       }
@@ -35,9 +36,10 @@ export function useGame(roomCode: string) {
   useEffect(() => {
     if (!roomCode || !gameState?.currentRound) return;
 
-    const unsubscribe = listenToValue<Round>(
+    const unsubscribe = listenToValue(
       `rounds/${roomCode}/${gameState.currentRound}`,
-      (data) => {
+      (snapshot) => {
+        const data = snapshot.val() as Round | null;
         setCurrentRound(data);
       }
     );
@@ -49,9 +51,10 @@ export function useGame(roomCode: string) {
   useEffect(() => {
     if (!roomCode || gameState?.status !== 'finished') return;
 
-    const unsubscribe = listenToValue<{ rankings: FinalRanking[] }>(
+    const unsubscribe = listenToValue(
       `gameResults/${roomCode}`,
-      (data) => {
+      (snapshot) => {
+        const data = snapshot.val() as { rankings: FinalRanking[] } | null;
         setFinalRankings(data?.rankings || null);
       }
     );

@@ -17,7 +17,7 @@
 ## 프로젝트 구조 (간략)
 ```
 catchmind/
-├── app/              # Next.js App Router (/, /room/[code])
+├── app/              # 자세한 구조 및 아키텍처는 [project-structure.md](project-structure.md) 참조
 ├── components/       # React 컴포넌트 (game/, lobby/, shared/)
 ├── lib/
 │   ├── domains/     # 도메인별 로직 (user, room, game, canvas, chat, answer, word)
@@ -26,7 +26,7 @@ catchmind/
 ├── types/            # TypeScript 타입
 └── public/           # 정적 파일
 ```
-> 자세한 구조 및 아키텍처는 [project-structure.md](project-structure.md) 참조
+
 
 ## 주요 문서
 - [features.md](features.md): 상세 기능 명세서
@@ -40,6 +40,7 @@ catchmind/
  - 애매한 경우 항상 물어봐줘
  - SOLID원칙을 모두 준수 해줘
  - 중복되는 내용이 없게 해줘
+ - 필드에 null 또는 undefind 를 허용하지 않는것 데이터들은 자신이 만들어질때 유효성검사를 미리 해줘
 
 ### 도메인별 문서화 규칙
 각 도메인 폴더(`lib/domains/{domain}/`)에는 **README.md** 파일을 두고 다음 내용을 포함:

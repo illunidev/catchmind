@@ -83,3 +83,24 @@ export const formatDate = (timestamp: number): string => {
   const date = new Date(timestamp);
   return date.toLocaleString('ko-KR');
 };
+
+/**
+ * 라운드 점수 계산
+ * @param answerOrder 정답 맞춘 순서 (1등, 2등, 3등...)
+ * @param timeLimit 제한 시간 (초)
+ * @param remainingTime 남은 시간 (초)
+ * @returns 획득 점수
+ */
+export const calculateRoundScore = (
+  answerOrder: number,
+  timeLimit: number,
+  remainingTime: number
+): number => {
+  // 기본 점수: 순서에 따라 감소 (1등: 100, 2등: 80, 3등: 60...)
+  const baseScore = Math.max(100 - (answerOrder - 1) * 20, 20);
+
+  // 시간 보너스: 남은 시간 비율에 따라 최대 50점 추가
+  const timeBonus = Math.floor((remainingTime / timeLimit) * 50);
+
+  return baseScore + timeBonus;
+};

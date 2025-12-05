@@ -7,6 +7,9 @@
 export const GAME_CONSTANTS = {
   MAX_PLAYERS: 6,
   MIN_PLAYERS: 2,
+  ROUNDS_PER_PLAYER: 2, // 플레이어당 라운드 수
+  MAX_ROUNDS: 10, // 최대 라운드 수
+  ROUND_TIME_LIMIT: 80, // 라운드 제한 시간 (초)
   ROUND_TIME: 60, // 초
   WORD_CHOICE_TIME: 30, // 초
   ROUND_END_DELAY: 3000, // ms

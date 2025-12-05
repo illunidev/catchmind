@@ -40,59 +40,6 @@ export function useCanvas({ roomCode, isDrawer }: UseCanvasOptions) {
     contextRef.current = context;
   }, []);
 
-  // 캔버스 상태 리스너
-  useEffect(() => {
-    if (!roomCode) return;
-
-    const unsubscribe = listenToValue<CanvasState>(
-      `canvases/${roomCode}`,
-      (data) => {
-        setCanvasState(data);
-        setLoading(false);
-
-        // 캔버스에 그리기
-        if (data && contextRef.current) {
-          redrawCanvas(data.strokes);
-        }
-      }
-    );
-
-    return () => unsubscribe();
-  }, [roomCode]);
-
-  // 새 스트로크 리스너 (실시간 그리기)
-  useEffect(() => {
-    if (!roomCode || !contextRef.current) return;
-
-    const unsubscribe = listenToChildAdded(
-      `canvases/${roomCode}/strokes`,
-      (stroke: Stroke) => {
-        if (stroke && contextRef.current) {
-          drawStroke(stroke);
-        }
-      }
-    );
-
-    return () => unsubscribe();
-  }, [roomCode]);
-
-  /**
-   * 캔버스 전체 다시 그리기
-   */
-  const redrawCanvas = useCallback((strokes: Stroke[]) => {
-    const canvas = canvasRef.current;
-    const context = contextRef.current;
-    if (!canvas || !context) return;
-
-    // 캔버스 지우기
-    context.clearRect(0, 0, canvas.width, canvas.height);
-
-    // 모든 스트로크 그리기
-    strokes.forEach((stroke) => {
-      drawStroke(stroke);
-    });
-  }, []);
-
   /**
    * 스트로크 그리기
    */
@@ -118,6 +65,66 @@ export function useCanvas({ roomCode, isDrawer }: UseCanvasOptions) {
 
     context.stroke();
   }, []);
+
+  /**
+   * 캔버스 전체 다시 그리기
+   */
+  const redrawCanvas = useCallback((strokes: Stroke[] | Record<string, Stroke>) => {
+    const canvas = canvasRef.current;
+    const context = contextRef.current;
+    if (!canvas || !context) return;
+
+    // 캔버스 지우기
+    context.clearRect(0, 0, canvas.width, canvas.height);
+
+    // strokes가 객체일 경우 배열로 변환
+    const strokeArray = Array.isArray(strokes)
+      ? strokes
+      : Object.values(strokes);
+
+    // 모든 스트로크 그리기
+    strokeArray.forEach((stroke) => {
+      drawStroke(stroke);
+    });
+  }, [drawStroke]);
+
+  // 캔버스 상태 리스너
+  useEffect(() => {
+    if (!roomCode) return;
+
+    const unsubscribe = listenToValue(
+      `canvases/${roomCode}`,
+      (snapshot) => {
+        const data = snapshot.val() as CanvasState | null;
+        setCanvasState(data);
+        setLoading(false);
+
+        // 캔버스에 그리기
+        if (data && contextRef.current && data.strokes) {
+          redrawCanvas(data.strokes);
+        }
+      }
+    );
+
+    return () => unsubscribe();
+  }, [roomCode, redrawCanvas]);
+
+  // 새 스트로크 리스너 (실시간 그리기)
+  useEffect(() => {
+    if (!roomCode || !contextRef.current) return;
+
+    const unsubscribe = listenToChildAdded(
+      `canvases/${roomCode}/strokes`,
+      (snapshot) => {
+        const stroke = snapshot.val() as Stroke | null;
+        if (stroke && contextRef.current) {
+          drawStroke(stroke);
+        }
+      }
+    );
+
+    return () => unsubscribe();
+  }, [roomCode, drawStroke]);
 
   /**
    * 그리기 시작

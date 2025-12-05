@@ -19,8 +19,8 @@ export class GameService {
     const drawOrder = shuffledPlayers.map(p => p.userId);
 
     const gameState: GameState = {
-      status: 'waiting',
-      currentRound: 0,
+      status: 'drawing',  // 게임 시작 시 drawing 상태
+      currentRound: 1,  // 첫 번째 라운드부터 시작
       totalRounds: calculateTotalRounds(players.length),
       drawOrder,
       startedAt: Date.now(),

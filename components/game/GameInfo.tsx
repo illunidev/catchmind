@@ -28,10 +28,6 @@ export function GameInfo({ gameState, currentRound, isDrawer }: GameInfoProps) {
       const elapsed = Date.now() - currentRound.startTime;
       const remaining = Math.max(0, currentRound.timeLimit - Math.floor(elapsed / 1000));
       setTimeLeft(remaining);
-
-      if (remaining === 0) {
-        clearInterval(interval);
-      }
     };
 
     updateTimer();
