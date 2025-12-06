@@ -227,6 +227,13 @@ class RoomService {
       console.log(`[leaveRoom] 마지막 플레이어 - 방 삭제`);
       updates[`rooms/${roomId}`] = null;
       updates[`roomDetails/${roomId}`] = null;
+
+      // 게임 관련 데이터도 함께 삭제 (roomCode 기반)
+      const roomCode = room.code;
+      updates[`gameStates/${roomCode}`] = null;
+      updates[`rounds/${roomCode}`] = null;
+      updates[`gameResults/${roomCode}`] = null;
+      updates[`canvases/${roomCode}`] = null;
     } else {
       // 플레이어만 삭제
       updates[`roomDetails/${roomId}/players/${userId}`] = null;
@@ -345,11 +352,24 @@ class RoomService {
 
   /**
    * 방 삭제
+   * - 방 메타데이터, 상세정보, 게임 관련 데이터 모두 삭제
    */
   async deleteRoom(roomId: string): Promise<void> {
+    // 방 코드 조회 (게임 데이터는 roomCode 기반)
+    const room = await getData<Room>(`rooms/${roomId}`);
+    const roomCode = room?.code;
+
     const updates: Record<string, any> = {};
     updates[`rooms/${roomId}`] = null;
     updates[`roomDetails/${roomId}`] = null;
+
+    // 게임 관련 데이터도 함께 삭제 (roomCode 기반)
+    if (roomCode) {
+      updates[`gameStates/${roomCode}`] = null;
+      updates[`rounds/${roomCode}`] = null;
+      updates[`gameResults/${roomCode}`] = null;
+      updates[`canvases/${roomCode}`] = null;
+    }
 
     await updateMultiplePaths(updates);
   }
@@ -357,6 +377,7 @@ class RoomService {
   /**
    * 종료된 방 자동 정리
    * - finished 상태이고 일정 시간이 지난 방 삭제
+   * - 게임 관련 데이터(gameStates, rounds, gameResults, canvases)도 함께 삭제
    * @param timeoutMs 종료 후 대기 시간 (기본값: 5분)
    */
   async cleanupFinishedRooms(timeoutMs: number = 5 * 60 * 1000): Promise<void> {
@@ -364,21 +385,26 @@ class RoomService {
     if (!rooms) return;
 
     const now = Date.now();
-    const roomsToDelete: string[] = [];
+    const roomsToDelete: { roomId: string; roomCode: string }[] = [];
 
     // finished 상태이고 timeoutMs 이상 경과한 방 찾기
     Object.entries(rooms).forEach(([roomId, room]) => {
       if (room.status === 'finished' && now - room.updatedAt > timeoutMs) {
-        roomsToDelete.push(roomId);
+        roomsToDelete.push({ roomId, roomCode: room.code });
       }
     });
 
     // 일괄 삭제
     if (roomsToDelete.length > 0) {
       const updates: Record<string, any> = {};
-      roomsToDelete.forEach((roomId) => {
+      roomsToDelete.forEach(({ roomId, roomCode }) => {
         updates[`rooms/${roomId}`] = null;
         updates[`roomDetails/${roomId}`] = null;
+        // 게임 관련 데이터도 함께 삭제 (roomCode 기반)
+        updates[`gameStates/${roomCode}`] = null;
+        updates[`rounds/${roomCode}`] = null;
+        updates[`gameResults/${roomCode}`] = null;
+        updates[`canvases/${roomCode}`] = null;
       });
 
       await updateMultiplePaths(updates);

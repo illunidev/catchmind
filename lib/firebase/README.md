@@ -63,6 +63,56 @@ NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID=...
 NEXT_PUBLIC_FIREBASE_APP_ID=...
 ```
 
+### 4. 방 삭제 시 연관 데이터 정리
+
+**문제:**
+방(Room) 삭제 시 게임 관련 데이터가 남아 DB에 고아 데이터(orphan data)가 쌓임
+
+**발생 원인:**
+- 방은 `roomId` 기반, 게임 데이터는 `roomCode` 기반으로 저장
+- 서비스 분리(RoomService/GameService)로 삭제 책임이 불명확
+- 점진적 개발로 새 경로 추가 시 기존 삭제 로직 업데이트 누락
+
+**삭제해야 할 경로:**
+```
+/rooms/{roomId}           # roomId 기반
+/roomDetails/{roomId}     # roomId 기반
+/gameStates/{roomCode}    # roomCode 기반
+/rounds/{roomCode}        # roomCode 기반
+/gameResults/{roomCode}   # roomCode 기반
+/canvases/{roomCode}      # roomCode 기반
+```
+
+**해결 방법:**
+방 삭제 시 `room.code`를 먼저 조회하여 모든 경로를 한 번에 삭제
+
+```typescript
+// ✅ 올바른 예 (roomService.deleteRoom)
+async deleteRoom(roomId: string): Promise<void> {
+  const room = await getData<Room>(`rooms/${roomId}`);
+  const roomCode = room?.code;
+
+  const updates: Record<string, any> = {};
+  updates[`rooms/${roomId}`] = null;
+  updates[`roomDetails/${roomId}`] = null;
+
+  if (roomCode) {
+    updates[`gameStates/${roomCode}`] = null;
+    updates[`rounds/${roomCode}`] = null;
+    updates[`gameResults/${roomCode}`] = null;
+    updates[`canvases/${roomCode}`] = null;
+  }
+
+  await updateMultiplePaths(updates);
+}
+```
+
+**체크리스트 (새 데이터 경로 추가 시):**
+- [ ] 해당 데이터가 방에 종속되는가?
+- [ ] 방 삭제 시 함께 삭제되어야 하는가?
+- [ ] `roomService.deleteRoom()`, `leaveRoom()`, `cleanupFinishedRooms()`에 추가했는가?
+
 ## 관련 파일
 - `lib/firebase/config.ts` - Firebase 초기화
 - `lib/firebase/database.ts` - Database 유틸 함수
+- `lib/domains/room/services/roomService.ts` - 방 생성/삭제 로직
