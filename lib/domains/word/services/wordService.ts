@@ -38,9 +38,9 @@ export class WordService {
     const shuffled = shuffle([...filteredWords]);
     const selected = shuffled.slice(0, 3);
 
-    // WordChoice 형식으로 변환
-    return selected.map((word) => ({
-      id: word.id,
+    // WordChoice 형식으로 변환 (id가 없으면 text를 id로 사용)
+    return selected.map((word, index) => ({
+      id: word.id || `word-${index}-${word.text}`,
       text: word.text,
     }));
   }
