@@ -26,7 +26,11 @@ export default function RoomPage({ params }: RoomPageProps) {
 
   // params 처리
   useEffect(() => {
-    params.then((p) => setRoomCode(p.code));
+    params.then((p) => {
+      setRoomCode(p.code);
+      // localStorage에 현재 방 코드 저장
+      localStorage.setItem('currentRoomCode', p.code);
+    });
   }, [params]);
 
   // 로그인 체크
@@ -63,6 +67,9 @@ export default function RoomPage({ params }: RoomPageProps) {
   // 게임 상태에 따라 적절한 라우트로 리다이렉트
   useEffect(() => {
     if (!roomCode || !room) return;
+
+    // localStorage에 현재 방 ID 저장 (나가기용)
+    localStorage.setItem('currentRoomId', room.id);
 
     // 한 번만 리다이렉트 (무한 루프 방지)
     if (!gameState) {

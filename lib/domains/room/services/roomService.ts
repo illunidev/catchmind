@@ -182,19 +182,28 @@ class RoomService {
    * 방 나가기
    */
   async leaveRoom(userId: string, roomId: string): Promise<void> {
+    console.log(`[leaveRoom] 시작: userId=${userId}, roomId=${roomId}`);
+
     // 플레이어 정보 조회
     const player = await getData<Player>(
       `roomDetails/${roomId}/players/${userId}`
     );
     if (!player) {
-      throw new Error('방에 참가하지 않은 유저입니다.');
+      // 이미 나간 방이면 조용히 리턴 (에러 던지지 않음)
+      console.log(`[leaveRoom] 이미 나간 방 또는 존재하지 않는 플레이어`);
+      return;
     }
+
+    console.log(`[leaveRoom] 플레이어 찾음:`, player);
 
     // 방 정보 조회
     const room = await getData<Room>(`rooms/${roomId}`);
     if (!room) {
+      console.log(`[leaveRoom] 방을 찾을 수 없음`);
       throw new Error('방을 찾을 수 없습니다.');
     }
+
+    console.log(`[leaveRoom] 방 찾음:`, room);
 
     // 모든 플레이어 조회
     const allPlayers = await getData<Record<string, Player>>(
@@ -208,29 +217,38 @@ class RoomService {
       (p) => p.userId !== userId
     );
 
+    console.log(`[leaveRoom] 남은 플레이어 수: ${remainingPlayers.length}`);
+
     // 업데이트 객체 준비
     const updates: Record<string, any> = {};
-    updates[`roomDetails/${roomId}/players/${userId}`] = null; // 삭제
 
     if (remainingPlayers.length === 0) {
-      // 마지막 플레이어면 방 삭제
+      // 마지막 플레이어면 방 전체 삭제 (플레이어 개별 삭제 불필요)
+      console.log(`[leaveRoom] 마지막 플레이어 - 방 삭제`);
       updates[`rooms/${roomId}`] = null;
       updates[`roomDetails/${roomId}`] = null;
     } else {
+      // 플레이어만 삭제
+      updates[`roomDetails/${roomId}/players/${userId}`] = null;
+
       // 인원 수 업데이트
+      console.log(`[leaveRoom] 인원 수 업데이트: ${remainingPlayers.length}`);
       updates[`rooms/${roomId}/currentPlayers`] = remainingPlayers.length;
       updates[`rooms/${roomId}/updatedAt`] = Date.now();
 
       // 방장이 나갔으면 다음 플레이어에게 권한 이전
       if (player.isHost) {
         const newHost = remainingPlayers[0];
+        console.log(`[leaveRoom] 방장 권한 이전: ${newHost.userId}`);
         updates[`roomDetails/${roomId}/players/${newHost.userId}/isHost`] = true;
         updates[`rooms/${roomId}/hostUserId`] = newHost.userId;
         updates[`roomDetails/${roomId}/info/hostUserId`] = newHost.userId;
       }
     }
 
+    console.log(`[leaveRoom] 업데이트 실행:`, updates);
     await updateMultiplePaths(updates);
+    console.log(`[leaveRoom] 완료`);
   }
 
   /**

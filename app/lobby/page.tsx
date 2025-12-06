@@ -38,6 +38,15 @@ export default function LobbyPage() {
     }
   }, [user, userLoading, router]);
 
+  // localStorage 정리 (이미 방에서 나온 상태)
+  useEffect(() => {
+    if (!user) return;
+
+    // 로비에 왔다는 것은 이미 방을 나갔다는 의미이므로 localStorage만 정리
+    localStorage.removeItem('currentRoomId');
+    localStorage.removeItem('currentRoomCode');
+  }, [user]);
+
   // 방 생성
   const handleCreateRoom = async (title: string, settings: RoomSettings) => {
     if (!user) return;

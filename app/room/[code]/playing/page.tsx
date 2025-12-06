@@ -9,6 +9,7 @@ import { useEffect, useState } from 'react';
 import { useRouter, useParams } from 'next/navigation';
 import { useUser } from '@/lib/domains/user/hooks/useUser';
 import { useRoom } from '@/lib/domains/room/hooks/useRoom';
+import { useRoomValidation } from '@/lib/domains/room/hooks/useRoomValidation';
 import { useGame } from '@/lib/domains/game/hooks/useGame';
 import { useAnswerCheck } from '@/lib/domains/answer/hooks/useAnswerCheck';
 import { roomService } from '@/lib/domains/room/services/roomService';
@@ -42,15 +43,7 @@ export default function PlayingRoomPage() {
   }, [user, userLoading, router]);
 
   // 방 유효성 체크
-  useEffect(() => {
-    if (!roomCode) return;
-    if (roomLoading) return;
-
-    if (!room) {
-      alert('존재하지 않는 방입니다.');
-      router.push('/');
-    }
-  }, [room, roomLoading, roomCode, router]);
+  useRoomValidation({ room, roomLoading, roomCode });
 
   // 게임 상태 체크
   useEffect(() => {
@@ -191,13 +184,13 @@ export default function PlayingRoomPage() {
   };
 
   const handleLeaveRoom = async () => {
-    try {
-      await roomService.leaveRoom(user.id, roomCode);
-      await chatService.sendSystemMessage(roomCode, `${user.nickname}님이 방을 나갔습니다.`);
-      router.push('/');
-    } catch (err) {
-      console.error('방 나가기 실패:', err);
-    }
+    if (!room) return;
+
+    await roomService.leaveRoom(user.id, room.id);
+    await chatService.sendSystemMessage(roomCode, `${user.nickname}님이 방을 나갔습니다.`);
+    localStorage.removeItem('currentRoomId');
+    localStorage.removeItem('currentRoomCode');
+    router.push('/lobby');
   };
 
   return (
