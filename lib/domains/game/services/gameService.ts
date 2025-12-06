@@ -114,11 +114,6 @@ export class GameService {
     await updateData(`rounds/${roomCode}/${roundNumber}`, {
       endTime: Date.now(),
     });
-
-    // 게임 상태를 대기로 변경
-    await updateData(`gameStates/${roomCode}`, {
-      status: 'waiting' as GamePhase,
-    });
   }
 
   /**

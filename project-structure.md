@@ -5,12 +5,19 @@
 ```
 catchmind/
 ├── app/                        # Next.js App Router
-│   ├── page.tsx               # / (로비/홈 화면)
+│   ├── page.tsx               # / (로그인 - 닉네임 입력)
+│   ├── lobby/
+│   │   └── page.tsx           # /lobby (로비 - 방 목록/생성/참가)
+│   ├── room/
+│   │   └── [code]/            # /room/[code] (게임 화면)
+│   │       ├── waiting/       # /room/[code]/waiting (대기실)
+│   │       │   └── page.tsx
+│   │       ├── playing/       # /room/[code]/playing (게임 진행)
+│   │       │   └── page.tsx
+│   │       └── finished/      # /room/[code]/finished (게임 종료)
+│   │           └── page.tsx
 │   ├── layout.tsx             # 루트 레이아웃
-│   ├── globals.css            # 전역 스타일
-│   └── room/
-│       └── [code]/
-│           └── page.tsx       # /room/KF652739 (게임 화면)
+│   └── globals.css            # 전역 스타일
 │
 ├── components/                 # React 컴포넌트
 │   ├── game/                  # 게임 관련 컴포넌트
@@ -25,7 +32,8 @@ catchmind/
 │   ├── lobby/                 # 로비 관련 컴포넌트
 │   │   ├── CreateRoomForm.tsx
 │   │   ├── JoinRoomForm.tsx
-│   │   └── NicknameInput.tsx
+│   │   ├── NicknameInput.tsx
+│   │   └── RoomList.tsx
 │   └── shared/                # 공통 컴포넌트
 │       ├── Button.tsx
 │       ├── Modal.tsx
@@ -123,24 +131,60 @@ catchmind/
 
 ## 라우팅 구조
 
-### App Router (Next.js 13+)
+### App Router (Next.js 15)
 
 | 경로 | 파일 | 설명 |
 |------|------|------|
-| `/` | `app/page.tsx` | 로비/홈 화면 (닉네임 입력, 방 생성/참가) |
-| `/room/[code]` | `app/room/[code]/page.tsx` | 게임 화면 (방 코드 동적 라우팅) |
+| `/` | `app/page.tsx` | 로그인 페이지 (닉네임 입력) |
+| `/lobby` | `app/lobby/page.tsx` | 로비 (방 목록, 방 생성/참가) |
+| `/room/[code]/waiting` | `app/room/[code]/waiting/page.tsx` | 대기실 (게임 시작 대기) |
+| `/room/[code]/playing` | `app/room/[code]/playing/page.tsx` | 게임 진행 화면 |
+| `/room/[code]/finished` | `app/room/[code]/finished/page.tsx` | 게임 종료 화면 (결과 및 순위) |
+
+### 라우팅 플로우
+
+```
+/ (로그인) → /lobby (로비) → /room/[code]/waiting (대기실)
+                                      ↓
+                              [게임 시작]
+                                      ↓
+                            /room/[code]/playing (게임 진행)
+                                      ↓
+                              [게임 종료]
+                                      ↓
+                            /room/[code]/finished (결과)
+                                      ↓
+                              [나가기/한판더]
+                                      ↓
+                            /room/[code]/waiting 또는 /lobby
+```
 
 ### 라우팅 예시
 
 ```typescript
-// app/page.tsx (로비)
-export default function LobbyPage() {
-  return <Lobby />;
+// app/page.tsx (로그인)
+export default function HomePage() {
+  return <LoginPage />; // 닉네임 입력 후 /lobby로 이동
 }
 
-// app/room/[code]/page.tsx (게임 화면)
-export default function RoomPage({ params }: { params: { code: string } }) {
+// app/lobby/page.tsx (로비)
+export default function LobbyPage() {
+  return <Lobby />; // 방 생성/참가 후 /room/[code]/waiting으로 이동
+}
+
+// app/room/[code]/waiting/page.tsx (대기실)
+export default function WaitingPage({ params }: { params: { code: string } }) {
+  return <WaitingRoom roomCode={params.code} />;
+}
+
+// app/room/[code]/playing/page.tsx (게임 진행)
+export default function PlayingPage({ params }: { params: { code: string } }) {
   return <GameRoom roomCode={params.code} />;
+}
+
+// app/room/[code]/finished/page.tsx (게임 종료)
+export default function FinishedPage({ params }: { params: { code: string } }) {
+  return <GameResult roomCode={params.code} />;
 }
 ```
 

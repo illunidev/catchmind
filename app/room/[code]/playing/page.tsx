@@ -166,18 +166,24 @@ export default function PlayingRoomPage() {
         `라운드가 종료되었습니다! 정답은 "${currentRound.word}"였습니다.`
       );
 
+      // 3초 대기 (결과 확인 시간)
+      await new Promise(resolve => setTimeout(resolve, 3000));
+
       // 마지막 라운드인 경우 게임 종료
       if (gameState.currentRound >= gameState.totalRounds) {
         await gameService.endGame(roomCode);
         await chatService.sendSystemMessage(roomCode, '게임이 종료되었습니다!');
+
+        // 최종 결과 페이지로 이동하기 전 1초 대기
+        await new Promise(resolve => setTimeout(resolve, 1000));
         router.push(`/room/${roomCode}/finished`);
       } else {
         // 다음 라운드로 진행
-        await gameService.startNextRound(roomCode, gameState.currentRound + 1);
         await chatService.sendSystemMessage(
           roomCode,
           `잠시 후 라운드 ${gameState.currentRound + 1}이(가) 시작됩니다.`
         );
+        await gameService.startNextRound(roomCode, gameState.currentRound + 1);
       }
     } catch (err) {
       console.error('라운드 종료 실패:', err);

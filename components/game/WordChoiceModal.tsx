@@ -36,7 +36,9 @@ export function WordChoiceModal({
           clearInterval(interval);
           // 시간 초과 시 첫 번째 단어 자동 선택
           if (choices.length > 0) {
-            onSelect(choices[0].word, choices[0].category);
+            setTimeout(() => {
+              onSelect(choices[0].word, choices[0].category);
+            }, 0);
           }
           return 0;
         }

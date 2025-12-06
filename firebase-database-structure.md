@@ -4,9 +4,10 @@
 1. [설계 원칙](#1-설계-원칙)
 2. [전체 구조 개요](#2-전체-구조-개요)
 3. [상세 데이터 구조](#3-상세-데이터-구조)
-4. [보안 규칙](#4-보안-규칙)
-5. [인덱싱 전략](#5-인덱싱-전략)
-6. [실시간 리스너 전략](#6-실시간-리스너-전략)
+4. [실제 게임 시나리오 예시](#4-실제-게임-시나리오-예시)
+5. [보안 규칙](#5-보안-규칙)
+6. [인덱싱 전략](#6-인덱싱-전략)
+7. [실시간 리스너 전략](#7-실시간-리스너-전략)
 
 ---
 
@@ -465,15 +466,589 @@ const randomWords = shuffle(allWords).slice(0, 4);
 
 ---
 
-## 4. 보안 규칙
+## 4. 실제 게임 시나리오 예시
 
-### 4.1 기본 원칙
+이 섹션에서는 실제 게임이 진행되는 동안 Firebase 데이터가 어떻게 변화하는지 시나리오별로 보여줍니다.
+
+---
+
+### 시나리오 1: 방 생성 및 플레이어 참가
+
+#### 1-1. 꼬공이 방을 생성
+
+```json
+{
+  "users": {
+    "user_kkogong": {
+      "nickname": "꼬공",
+      "avatarUrl": null,
+      "createdAt": 1704067200000,
+      "lastActive": 1704067200000
+    }
+  },
+  "rooms": {
+    "room_KF652739": {
+      "code": "KF652739",
+      "title": "즐거운 그림 방",
+      "hostUserId": "user_kkogong",
+      "currentPlayers": 1,
+      "maxPlayers": 6,
+      "status": "waiting",
+      "settings": {
+        "category": "all",
+        "difficulty": "normal"
+      },
+      "createdAt": 1704067200000,
+      "updatedAt": 1704067200000
+    }
+  },
+  "roomDetails": {
+    "room_KF652739": {
+      "info": {
+        "code": "KF652739",
+        "title": "즐거운 그림 방",
+        "hostUserId": "user_kkogong",
+        "status": "waiting",
+        "settings": {
+          "maxPlayers": 6,
+          "category": "all",
+          "difficulty": "normal"
+        },
+        "createdAt": 1704067200000
+      },
+      "players": {
+        "user_kkogong": {
+          "userId": "user_kkogong",
+          "nickname": "꼬공",
+          "avatarUrl": null,
+          "score": 0,
+          "status": "idle",
+          "lastChat": null,
+          "isHost": true,
+          "joinedAt": 1704067200000,
+          "isOnline": true,
+          "lastSeen": 1704067200000
+        }
+      }
+    }
+  }
+}
+```
+
+#### 1-2. 다조이, 보미쌤이 참가 (총 3명)
+
+```json
+{
+  "rooms": {
+    "room_KF652739": {
+      "currentPlayers": 3,
+      "updatedAt": 1704067400000
+    }
+  },
+  "roomDetails": {
+    "room_KF652739": {
+      "players": {
+        "user_kkogong": { /* 기존 */ },
+        "user_dajoy": {
+          "userId": "user_dajoy",
+          "nickname": "다조이",
+          "avatarUrl": null,
+          "score": 0,
+          "status": "idle",
+          "lastChat": null,
+          "isHost": false,
+          "joinedAt": 1704067300000,
+          "isOnline": true,
+          "lastSeen": 1704067300000
+        },
+        "user_bomissam": {
+          "userId": "user_bomissam",
+          "nickname": "보미쌤",
+          "avatarUrl": null,
+          "score": 0,
+          "status": "idle",
+          "lastChat": null,
+          "isHost": false,
+          "joinedAt": 1704067400000,
+          "isOnline": true,
+          "lastSeen": 1704067400000
+        }
+      }
+    }
+  }
+}
+```
+
+---
+
+### 시나리오 2: 게임 시작 및 첫 라운드
+
+#### 2-1. 방장(꼬공)이 게임 시작 버튼 클릭
+
+**변경사항:**
+- Room status: `waiting` → `playing`
+- Game 객체 생성
+- 첫 번째 drawer 지정 (꼬공)
+- Phase: `choosing`
+
+```json
+{
+  "rooms": {
+    "room_KF652739": {
+      "status": "playing",
+      "updatedAt": 1704067500000
+    }
+  },
+  "roomDetails": {
+    "room_KF652739": {
+      "info": {
+        "status": "playing"
+      },
+      "game": {
+        "gameId": "game_1704067500",
+        "phase": "choosing",
+        "roundIndex": 0,
+        "totalRounds": 6,
+        "drawerUserId": "user_kkogong",
+        "wordForDrawer": null,
+        "hintForGuessers": null,
+        "remainingSeconds": 20,
+        "answeredOrder": [],
+        "drawerOrder": ["user_kkogong", "user_dajoy", "user_bomissam", "user_kkogong", "user_dajoy", "user_bomissam"],
+        "startedAt": 1704067500000,
+        "currentRoundStartedAt": 1704067500000
+      },
+      "players": {
+        "user_kkogong": {
+          "status": "choosing",
+          "score": 0
+        },
+        "user_dajoy": {
+          "status": "guessing",
+          "score": 0
+        },
+        "user_bomissam": {
+          "status": "guessing",
+          "score": 0
+        }
+      },
+      "chat": {
+        "messages": {
+          "msg_001": {
+            "userId": null,
+            "type": "system",
+            "content": "보미쌤: 게임이 시작되었습니다! 꼬공님, 제시어를 선택해주세요.",
+            "timestamp": 1704067500000
+          }
+        }
+      }
+    }
+  }
+}
+```
+
+#### 2-2. 꼬공이 제시어 "팥빙수" 선택 (20초 타이머 중 5초 경과)
+
+**변경사항:**
+- Phase: `choosing` → `drawing`
+- wordForDrawer 설정
+- hintForGuessers 설정
+- remainingSeconds 초기화 (60초)
+
+```json
+{
+  "roomDetails": {
+    "room_KF652739": {
+      "game": {
+        "phase": "drawing",
+        "wordForDrawer": "팥빙수",
+        "hintForGuessers": "3글자",
+        "remainingSeconds": 60,
+        "currentRoundStartedAt": 1704067515000
+      },
+      "players": {
+        "user_kkogong": {
+          "status": "drawing"
+        },
+        "user_dajoy": {
+          "status": "guessing"
+        },
+        "user_bomissam": {
+          "status": "guessing"
+        }
+      },
+      "chat": {
+        "messages": {
+          "msg_002": {
+            "userId": null,
+            "type": "system",
+            "content": "보미쌤: 꼬공님, 그림을 그려주세요! 힌트: 3글자",
+            "timestamp": 1704067515000
+          }
+        }
+      }
+    }
+  }
+}
+```
+
+---
+
+### 시나리오 3: 게임 진행 중 (그리기 및 채팅)
+
+#### 3-1. 꼬공이 캔버스에 그림 그리기 (진행 중 30초)
+
+```json
+{
+  "roomDetails": {
+    "room_KF652739": {
+      "game": {
+        "remainingSeconds": 30
+      },
+      "canvas": {
+        "strokes": {
+          "stroke_001": {
+            "points": [
+              {"x": 100, "y": 100},
+              {"x": 105, "y": 105},
+              {"x": 110, "y": 110}
+            ],
+            "color": "#FF0000",
+            "size": 5,
+            "tool": "pen",
+            "timestamp": 1704067530000
+          },
+          "stroke_002": {
+            "points": [
+              {"x": 200, "y": 150},
+              {"x": 205, "y": 155},
+              {"x": 210, "y": 160}
+            ],
+            "color": "#0000FF",
+            "size": 3,
+            "tool": "pen",
+            "timestamp": 1704067535000
+          }
+        },
+        "lastUpdated": 1704067535000
+      }
+    }
+  }
+}
+```
+
+#### 3-2. 다조이가 채팅으로 오답 입력 (진행 중 20초)
+
+```json
+{
+  "roomDetails": {
+    "room_KF652739": {
+      "game": {
+        "remainingSeconds": 20
+      },
+      "players": {
+        "user_dajoy": {
+          "lastChat": "아이스크림"
+        }
+      },
+      "chat": {
+        "messages": {
+          "msg_003": {
+            "userId": "user_dajoy",
+            "type": "user",
+            "content": "아이스크림",
+            "timestamp": 1704067555000
+          }
+        }
+      }
+    }
+  }
+}
+```
+
+#### 3-3. 다조이가 정답 입력! (진행 중 15초)
+
+**변경사항:**
+- 다조이 status: `guessing` → `answered`
+- 다조이 점수 업데이트 (1등: 10점 + 시간보너스 2점 = 12점)
+- answeredOrder에 추가
+
+```json
+{
+  "roomDetails": {
+    "room_KF652739": {
+      "game": {
+        "remainingSeconds": 15,
+        "answeredOrder": ["user_dajoy"]
+      },
+      "players": {
+        "user_dajoy": {
+          "status": "answered",
+          "score": 12,
+          "lastChat": "정답!"
+        }
+      },
+      "chat": {
+        "messages": {
+          "msg_004": {
+            "userId": "user_dajoy",
+            "type": "answer",
+            "content": "정답!",
+            "originalContent": "팥빙수",
+            "timestamp": 1704067560000
+          },
+          "msg_005": {
+            "userId": null,
+            "type": "system",
+            "content": "보미쌤: 다조이님이 1등으로 정답을 맞추셨어요!",
+            "timestamp": 1704067560000
+          }
+        }
+      }
+    }
+  }
+}
+```
+
+#### 3-4. 보미쌤도 정답 입력! (진행 중 8초)
+
+```json
+{
+  "roomDetails": {
+    "room_KF652739": {
+      "game": {
+        "remainingSeconds": 8,
+        "answeredOrder": ["user_dajoy", "user_bomissam"]
+      },
+      "players": {
+        "user_bomissam": {
+          "status": "answered",
+          "score": 8,
+          "lastChat": "정답!"
+        }
+      },
+      "chat": {
+        "messages": {
+          "msg_006": {
+            "userId": "user_bomissam",
+            "type": "answer",
+            "content": "정답!",
+            "originalContent": "팥빙수",
+            "timestamp": 1704067567000
+          },
+          "msg_007": {
+            "userId": null,
+            "type": "system",
+            "content": "보미쌤: 보미쌤님이 2등으로 정답을 맞추셨어요!",
+            "timestamp": 1704067567000
+          }
+        }
+      }
+    }
+  }
+}
+```
+
+---
+
+### 시나리오 4: 라운드 종료
+
+#### 4-1. 모든 플레이어가 정답 맞춤 → 라운드 조기 종료
+
+**변경사항:**
+- Phase: `drawing` → `roundEnd`
+- Drawer 점수 업데이트 (모두 정답: 5점 + 3점 = 8점)
+- 3초 대기 후 다음 라운드로
+
+```json
+{
+  "roomDetails": {
+    "room_KF652739": {
+      "game": {
+        "phase": "roundEnd",
+        "remainingSeconds": 0
+      },
+      "players": {
+        "user_kkogong": {
+          "status": "idle",
+          "score": 8
+        },
+        "user_dajoy": {
+          "status": "idle",
+          "score": 12
+        },
+        "user_bomissam": {
+          "status": "idle",
+          "score": 8
+        }
+      },
+      "canvas": null,
+      "chat": {
+        "messages": {
+          "msg_008": {
+            "userId": null,
+            "type": "system",
+            "content": "보미쌤: 라운드가 종료되었습니다! 정답은 '팥빙수'였어요.",
+            "timestamp": 1704067567000
+          }
+        }
+      }
+    }
+  }
+}
+```
+
+#### 4-2. 3초 후 다음 라운드 시작 (Drawer: 다조이)
+
+```json
+{
+  "roomDetails": {
+    "room_KF652739": {
+      "game": {
+        "phase": "choosing",
+        "roundIndex": 1,
+        "drawerUserId": "user_dajoy",
+        "wordForDrawer": null,
+        "hintForGuessers": null,
+        "remainingSeconds": 20,
+        "answeredOrder": [],
+        "currentRoundStartedAt": 1704067570000
+      },
+      "players": {
+        "user_kkogong": {
+          "status": "guessing"
+        },
+        "user_dajoy": {
+          "status": "choosing"
+        },
+        "user_bomissam": {
+          "status": "guessing"
+        }
+      },
+      "canvas": null,
+      "chat": {
+        "messages": {
+          "msg_009": {
+            "userId": null,
+            "type": "system",
+            "content": "보미쌤: 라운드 2/6이 시작됩니다! 다조이님, 제시어를 선택해주세요.",
+            "timestamp": 1704067570000
+          }
+        }
+      }
+    }
+  }
+}
+```
+
+---
+
+### 시나리오 5: 게임 종료
+
+#### 5-1. 마지막 라운드 종료 후
+
+**변경사항:**
+- Room status: `playing` → `finished`
+- Game phase: `roundEnd` → `finished`
+
+```json
+{
+  "rooms": {
+    "room_KF652739": {
+      "status": "finished",
+      "updatedAt": 1704068000000
+    }
+  },
+  "roomDetails": {
+    "room_KF652739": {
+      "info": {
+        "status": "finished"
+      },
+      "game": {
+        "phase": "finished",
+        "roundIndex": 5
+      },
+      "players": {
+        "user_kkogong": {
+          "status": "idle",
+          "score": 55
+        },
+        "user_dajoy": {
+          "status": "idle",
+          "score": 63
+        },
+        "user_bomissam": {
+          "status": "idle",
+          "score": 47
+        }
+      },
+      "canvas": null,
+      "chat": {
+        "messages": {
+          "msg_100": {
+            "userId": null,
+            "type": "system",
+            "content": "보미쌤: 게임이 종료되었습니다! 1등: 다조이 (63점), 2등: 꼬공 (55점), 3등: 보미쌤 (47점)",
+            "timestamp": 1704068000000
+          }
+        }
+      }
+    }
+  }
+}
+```
+
+---
+
+### 시나리오 6: 플레이어 연결 끊김 및 재접속
+
+#### 6-1. 보미쌤의 인터넷 연결 끊김
+
+```json
+{
+  "roomDetails": {
+    "room_KF652739": {
+      "players": {
+        "user_bomissam": {
+          "isOnline": false,
+          "lastSeen": 1704067800000
+        }
+      }
+    }
+  }
+}
+```
+
+#### 6-2. 보미쌤 재접속
+
+```json
+{
+  "roomDetails": {
+    "room_KF652739": {
+      "players": {
+        "user_bomissam": {
+          "isOnline": true,
+          "lastSeen": 1704067850000
+        }
+      }
+    }
+  }
+}
+```
+
+재접속 시 클라이언트는 현재 게임 상태를 다시 로드하여 진행 중인 라운드에 참여합니다.
+
+---
+
+## 5. 보안 규칙
+
+### 5.1 기본 원칙
 - 인증된 유저만 읽기/쓰기 가능
 - 자기 자신의 데이터만 수정 가능
 - 방장만 방 설정 변경 가능
 - Drawer만 캔버스 쓰기 가능
 
-### 4.2 보안 규칙 (Firebase Rules)
+### 5.2 보안 규칙 (Firebase Rules)
 
 ```json
 {

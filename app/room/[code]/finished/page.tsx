@@ -44,10 +44,14 @@ export default function FinishedRoomPage() {
 
   // 게임 상태 체크
   useEffect(() => {
-    if (!gameState) {
-      router.push(`/room/${roomCode}/waiting`);
-    } else if (gameState.status !== 'finished') {
-      router.push(`/room/${roomCode}/playing`);
+    if (!gameState) return; // 로딩 중에는 대기
+
+    if (gameState.status !== 'finished') {
+      if (gameState.status === 'waiting') {
+        router.replace(`/room/${roomCode}/waiting`);
+      } else if (gameState.status === 'drawing') {
+        router.replace(`/room/${roomCode}/playing`);
+      }
     }
   }, [gameState, roomCode, router]);
 

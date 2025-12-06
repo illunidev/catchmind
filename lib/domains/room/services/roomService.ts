@@ -312,6 +312,18 @@ class RoomService {
     if (!players) return [];
     return Object.values(players);
   }
+
+  /**
+   * 모든 방 목록 조회 (대기 중인 방만)
+   */
+  async getRoomList(): Promise<Room[]> {
+    const rooms = await getData<Record<string, Room>>('rooms');
+    if (!rooms) return [];
+
+    return Object.values(rooms)
+      .filter((room) => room.status === 'waiting')
+      .sort((a, b) => b.createdAt - a.createdAt); // 최신순 정렬
+  }
 }
 
 // Singleton 인스턴스

@@ -231,3 +231,57 @@ canvases/
 2. **로컬 우선 렌더링**: 즉시 로컬에 그려서 지연 없는 UX 제공
 3. **childAdded 리스너**: 새 스트로크만 수신하여 불필요한 리렌더링 방지
 4. **캔버스 크기 고정**: 반응형 대신 고정 크기로 좌표 계산 단순화
+
+---
+
+## ⚠️ 주의사항 및 자주 발생하는 이슈
+
+### 1. Firebase 배열 처리 이슈 ⭐
+
+**문제:**
+`strokes` 배열이 Firebase에서 객체로 반환되어 배열 메서드 사용 시 오류 발생
+
+**원인:**
+Firebase Realtime Database는 배열을 `{ 0: item1, 1: item2 }` 형태의 객체로 저장
+
+**해결 방법:**
+[Firebase README - 배열 처리 이슈](../../firebase/README.md#1-배열-처리-이슈) 참조
+
+**적용 위치:**
+- `useCanvas.ts` - `redrawCanvas` 함수 (line 72-89)
+  ```typescript
+  const strokeArray = Array.isArray(strokes)
+    ? strokes
+    : Object.values(strokes);
+  ```
+- `canvasService.ts` - `undo` 함수 (line 54-70)
+  ```typescript
+  const strokeArray = Array.isArray(canvas.strokes)
+    ? canvas.strokes
+    : Object.values(canvas.strokes);
+  ```
+
+### 2. Context 초기화
+
+**주의사항:**
+캔버스 그리기 전 반드시 context를 초기화하고 설정해야 부드러운 선이 그려집니다.
+
+```typescript
+const context = canvas.getContext('2d');
+if (!context) return;
+
+context.lineCap = 'round';    // 선 끝 모양
+context.lineJoin = 'round';   // 선 연결 부분 모양
+```
+
+### 3. 좌표 계산 시 주의
+
+마우스/터치 이벤트에서 캔버스 상대 좌표를 계산할 때 반드시 `getBoundingClientRect()`를 사용:
+
+```typescript
+const rect = canvasRef.current?.getBoundingClientRect();
+if (!rect) return;
+
+const x = e.clientX - rect.left;
+const y = e.clientY - rect.top;
+```
