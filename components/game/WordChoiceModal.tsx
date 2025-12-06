@@ -12,7 +12,7 @@ import { Modal } from '@/components/shared/Modal';
 interface WordChoiceModalProps {
   isOpen: boolean;
   choices: WordChoice[];
-  onSelect: (word: string, category: string) => void;
+  onSelect: (word: string) => void;
   timeLimit?: number; // 선택 제한 시간 (초)
 }
 
@@ -37,7 +37,7 @@ export function WordChoiceModal({
           // 시간 초과 시 첫 번째 단어 자동 선택
           if (choices.length > 0) {
             setTimeout(() => {
-              onSelect(choices[0].word, choices[0].category);
+              onSelect(choices[0].text);
             }, 0);
           }
           return 0;
@@ -77,16 +77,13 @@ export function WordChoiceModal({
         <div className="grid grid-cols-1 gap-4">
           {choices.map((choice, index) => (
             <button
-              key={index}
-              onClick={() => onSelect(choice.word, choice.category)}
+              key={choice.id}
+              onClick={() => onSelect(choice.text)}
               className="group relative p-6 bg-white border-2 border-gray-300 rounded-lg hover:border-blue-500 hover:bg-blue-50 transition-all duration-200 transform hover:scale-105"
             >
               <div className="text-center">
                 <p className="text-3xl font-bold text-gray-900 mb-2">
-                  {choice.word}
-                </p>
-                <p className="text-sm text-gray-500">
-                  {getCategoryName(choice.category)}
+                  {choice.text}
                 </p>
               </div>
               <div className="absolute inset-0 border-2 border-transparent group-hover:border-blue-500 rounded-lg pointer-events-none"></div>

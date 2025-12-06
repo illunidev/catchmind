@@ -9,6 +9,7 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useUser } from '@/lib/domains/user/hooks/useUser';
 import { useRoomList } from '@/lib/domains/room/hooks/useRoomList';
+import { useRoomCleanup } from '@/lib/domains/room/hooks/useRoomCleanup';
 import { roomService } from '@/lib/domains/room/services/roomService';
 import { CreateRoomForm } from '@/components/lobby/CreateRoomForm';
 import { JoinRoomForm } from '@/components/lobby/JoinRoomForm';
@@ -26,6 +27,9 @@ export default function LobbyPage() {
   const [showJoinModal, setShowJoinModal] = useState(false);
   const [actionLoading, setActionLoading] = useState(false);
   const [error, setError] = useState('');
+
+  // 방 자동 정리 (1분마다 체크, 5분 이상 지난 finished 방 삭제)
+  useRoomCleanup();
 
   // 로그인 안 된 상태면 홈으로 리다이렉트
   useEffect(() => {

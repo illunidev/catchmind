@@ -1,0 +1,53 @@
+{
+  "rules": {
+    "users": {
+      "$userId": {
+        ".read": "auth != null",
+        ".write": "auth != null && auth.uid == $userId"
+      }
+    },
+    "rooms": {
+      ".read": "auth != null",
+      "$roomId": {
+        ".write": "auth != null"
+      }
+    },
+    "roomDetails": {
+      "$roomId": {
+        ".read": "auth != null && data.child('players').child(auth.uid).exists()",
+        "info": {
+          ".write": "auth != null && (!data.exists() || data.parent().child('info/hostUserId').val() == auth.uid)"
+        },
+        "players": {
+          "$playerId": {
+            ".write": "auth != null && (auth.uid == $playerId || data.parent().parent().child('info/hostUserId').val() == auth.uid)"
+          }
+        },
+        "game": {
+          ".write": "auth != null && data.parent().child('info/hostUserId').val() == auth.uid"
+        },
+        "canvas": {
+          ".read": "auth != null && data.parent().child('players').child(auth.uid).exists()",
+          "strokes": {
+            ".write": "auth != null && data.parent().parent().child('game/drawerUserId').val() == auth.uid"
+          }
+        },
+        "chat": {
+          "messages": {
+            ".write": "auth != null && data.parent().parent().parent().child('players').child(auth.uid).exists()"
+          }
+        }
+      }
+    },
+    "words": {
+      ".read": "auth != null",
+      ".write": false
+    },
+    "gameHistory": {
+      ".read": "auth != null",
+      "$gameId": {
+        ".write": "auth != null && !data.exists()"
+      }
+    }
+  }
+}

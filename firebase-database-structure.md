@@ -1047,6 +1047,7 @@ const randomWords = shuffle(allWords).slice(0, 4);
 - 자기 자신의 데이터만 수정 가능
 - 방장만 방 설정 변경 가능
 - Drawer만 캔버스 쓰기 가능
+- 방 삭제는 방 참가자만 가능 (마지막 플레이어 퇴장 시 자동 삭제)
 
 ### 5.2 보안 규칙 (Firebase Rules)
 

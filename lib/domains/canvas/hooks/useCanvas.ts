@@ -6,7 +6,7 @@
 'use client';
 
 import { useEffect, useState, useRef, useCallback } from 'react';
-import { CanvasState, Stroke, Point, DrawingTool } from '@/types/canvas';
+import { CanvasState, Stroke, Point, ToolType } from '@/types/canvas';
 import { listenToValue, listenToChildAdded } from '@/lib/firebase/database';
 import { canvasService } from '../services/canvasService';
 
@@ -17,7 +17,7 @@ interface UseCanvasOptions {
 
 export function useCanvas({ roomCode, isDrawer }: UseCanvasOptions) {
   const [canvasState, setCanvasState] = useState<CanvasState | null>(null);
-  const [tool, setTool] = useState<DrawingTool>('pen');
+  const [tool, setTool] = useState<ToolType>('pen');
   const [color, setColor] = useState('#000000');
   const [lineWidth, setLineWidth] = useState(3);
   const [isDrawing, setIsDrawing] = useState(false);

@@ -12,7 +12,8 @@ export class CanvasService {
    */
   async initCanvas(roomCode: string): Promise<CanvasState> {
     const canvasState: CanvasState = {
-      strokes: [],
+      strokes: {},
+      cleared: false,
       lastUpdated: Date.now(),
     };
 

@@ -324,6 +324,48 @@ class RoomService {
       .filter((room) => room.status === 'waiting')
       .sort((a, b) => b.createdAt - a.createdAt); // 최신순 정렬
   }
+
+  /**
+   * 방 삭제
+   */
+  async deleteRoom(roomId: string): Promise<void> {
+    const updates: Record<string, any> = {};
+    updates[`rooms/${roomId}`] = null;
+    updates[`roomDetails/${roomId}`] = null;
+
+    await updateMultiplePaths(updates);
+  }
+
+  /**
+   * 종료된 방 자동 정리
+   * - finished 상태이고 일정 시간이 지난 방 삭제
+   * @param timeoutMs 종료 후 대기 시간 (기본값: 5분)
+   */
+  async cleanupFinishedRooms(timeoutMs: number = 5 * 60 * 1000): Promise<void> {
+    const rooms = await getData<Record<string, Room>>('rooms');
+    if (!rooms) return;
+
+    const now = Date.now();
+    const roomsToDelete: string[] = [];
+
+    // finished 상태이고 timeoutMs 이상 경과한 방 찾기
+    Object.entries(rooms).forEach(([roomId, room]) => {
+      if (room.status === 'finished' && now - room.updatedAt > timeoutMs) {
+        roomsToDelete.push(roomId);
+      }
+    });
+
+    // 일괄 삭제
+    if (roomsToDelete.length > 0) {
+      const updates: Record<string, any> = {};
+      roomsToDelete.forEach((roomId) => {
+        updates[`rooms/${roomId}`] = null;
+        updates[`roomDetails/${roomId}`] = null;
+      });
+
+      await updateMultiplePaths(updates);
+    }
+  }
 }
 
 // Singleton 인스턴스

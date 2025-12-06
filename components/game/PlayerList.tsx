@@ -27,7 +27,7 @@ export function PlayerList({ players, currentDrawerId }: PlayerListProps) {
             className={`flex items-center justify-between p-3 rounded-lg ${
               player.userId === currentDrawerId
                 ? 'bg-blue-100 border-2 border-blue-500'
-                : player.status === 'ready'
+                : player.status === 'answered'
                 ? 'bg-green-50'
                 : 'bg-gray-50'
             }`}
@@ -54,7 +54,7 @@ export function PlayerList({ players, currentDrawerId }: PlayerListProps) {
                   )}
                 </p>
                 <p className="text-xs text-gray-500">
-                  {player.status === 'ready' ? '준비 완료' : '대기 중'}
+                  {player.status === 'answered' ? '정답!' : player.status === 'guessing' ? '맞추는 중' : player.status === 'drawing' ? '그리는 중' : '대기 중'}
                 </p>
               </div>
             </div>

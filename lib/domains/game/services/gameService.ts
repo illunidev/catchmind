@@ -38,17 +38,15 @@ export class GameService {
     roomCode: string,
     roundNumber: number,
     drawerId: string,
-    word: string,
-    category: string
+    word: string
   ): Promise<Round> {
     const round: Round = {
       roundNumber,
       drawerId,
       word,
-      category,
       startTime: Date.now(),
       timeLimit: GAME_CONSTANTS.ROUND_TIME_LIMIT,
-      answers: [],
+      answers: {},
     };
 
     await updateData(`gameStates/${roomCode}`, {
@@ -79,7 +77,7 @@ export class GameService {
     }
 
     const elapsedTime = Date.now() - round.startTime;
-    const answerOrder = (round.answers?.length || 0) + 1;
+    const answerOrder = (round.answers ? Object.keys(round.answers).length : 0) + 1;
 
     // 점수 계산
     let score = 0;
@@ -164,7 +162,7 @@ export class GameService {
         if (!playerScores[round.drawerId]) {
           playerScores[round.drawerId] = 0;
         }
-        playerScores[round.drawerId] += SCORE_CONSTANTS.DRAWER_BONUS * correctAnswers;
+        playerScores[round.drawerId] += SCORE_CONSTANTS.DRAWER_ALL_CORRECT * correctAnswers;
       }
     });
 

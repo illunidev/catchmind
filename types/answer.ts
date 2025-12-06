@@ -17,5 +17,7 @@ export interface RoundAnswer {
 export interface AnswerCheckResult {
   isCorrect: boolean;
   orderIndex?: number;
-  scoreGain: number;
+  scoreGain?: number;
+  similarity?: number;
+  hint?: string;
 }

@@ -24,7 +24,6 @@ export type {
   GameState,
   GamePhase,
   Round,
-  RoundResult,
   FinalRanking,
 } from './game';
 

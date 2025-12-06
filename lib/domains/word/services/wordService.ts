@@ -40,8 +40,8 @@ export class WordService {
 
     // WordChoice 형식으로 변환
     return selected.map((word) => ({
-      word: word.word,
-      category: word.category,
+      id: word.id,
+      text: word.text,
     }));
   }
 
@@ -53,11 +53,13 @@ export class WordService {
     const randomIndex = Math.floor(Math.random() * choices.length);
     const choice = choices[randomIndex];
 
-    return {
-      word: choice.word,
-      category: choice.category,
-      difficulty: settings.difficulty,
-    };
+    // WordChoice의 id를 사용하여 실제 Word 찾기
+    const word = wordBank.find((w) => w.id === choice.id);
+    if (!word) {
+      throw new Error('단어를 찾을 수 없습니다.');
+    }
+
+    return word;
   }
 
   /**
@@ -76,7 +78,7 @@ export class WordService {
    * 단어 검증
    */
   validateWord(word: string): boolean {
-    return wordBank.some((w) => w.word === word);
+    return wordBank.some((w) => w.text === word);
   }
 
   /**

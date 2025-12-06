@@ -16,7 +16,7 @@ export class ChatService {
     userId: string,
     nickname: string,
     content: string,
-    type: MessageType = 'chat'
+    type: MessageType = 'user'
   ): Promise<ChatMessage> {
     const message: ChatMessage = {
       id: generateId(),

@@ -11,12 +11,12 @@ export interface Point {
 export type ToolType = 'pen' | 'eraser';
 
 export interface Stroke {
-  id: string;
+  id?: string;
   points: Point[];
   color: string;
-  size: number;
+  lineWidth: number;
   tool: ToolType;
-  timestamp: number;
+  timestamp?: number;
 }
 
 export interface CanvasState {
@@ -28,5 +28,5 @@ export interface CanvasState {
 export interface DrawingTool {
   type: ToolType;
   color: string;
-  size: number;
+  lineWidth: number;
 }

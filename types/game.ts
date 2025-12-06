@@ -17,7 +17,6 @@ export interface Round {
   roundNumber: number;
   drawerId: string;
   word: string;
-  category: string;
   startTime: number;
   timeLimit: number;
   answers?: Record<string, RoundAnswer>;

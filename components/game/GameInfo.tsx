@@ -41,22 +41,21 @@ export function GameInfo({ gameState, currentRound, isDrawer }: GameInfoProps) {
     if (!currentRound || isDrawer) return '';
 
     const wordLength = currentRound.word.length;
-    const category = getCategoryName(currentRound.category);
 
     // 시간에 따라 힌트 공개
     const progress = timeLeft / currentRound.timeLimit;
 
     if (progress > 0.7) {
-      return `${category} | ${'_ '.repeat(wordLength)}`;
+      return `${'_ '.repeat(wordLength)}`;
     } else if (progress > 0.4) {
       // 첫 글자 공개
       const firstChar = currentRound.word[0];
-      return `${category} | ${firstChar} ${'_ '.repeat(wordLength - 1)}`;
+      return `${firstChar} ${'_ '.repeat(wordLength - 1)}`;
     } else {
       // 첫 글자와 마지막 글자 공개
       const firstChar = currentRound.word[0];
       const lastChar = currentRound.word[wordLength - 1];
-      return `${category} | ${firstChar} ${'_ '.repeat(wordLength - 2)}${lastChar}`;
+      return `${firstChar} ${'_ '.repeat(wordLength - 2)}${lastChar}`;
     }
   };
 
@@ -114,9 +113,6 @@ export function GameInfo({ gameState, currentRound, isDrawer }: GameInfoProps) {
                 <p className="text-sm text-blue-800 mb-2">출제 단어:</p>
                 <p className="text-3xl font-bold text-blue-900">
                   {currentRound.word}
-                </p>
-                <p className="text-sm text-blue-700 mt-2">
-                  카테고리: {getCategoryName(currentRound.category)}
                 </p>
               </div>
             ) : (

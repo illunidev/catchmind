@@ -108,13 +108,13 @@ export default function PlayingRoomPage() {
 
   const isDrawer = currentRound?.drawerId === user.id;
 
-  const handleWordSelect = async (word: string, category: string) => {
+  const handleWordSelect = async (word: string) => {
     if (!gameState) return;
 
     setShowWordChoice(false);
 
     try {
-      await startRound(gameState.currentRound, user.id, word, category);
+      await startRound(gameState.currentRound, user.id, word);
       await chatService.sendSystemMessage(roomCode, '라운드가 시작되었습니다!');
 
       setTimeout(async () => {

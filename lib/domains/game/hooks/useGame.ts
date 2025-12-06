@@ -80,11 +80,10 @@ export function useGame(roomCode: string) {
   const startRound = async (
     roundNumber: number,
     drawerId: string,
-    word: string,
-    category: string
+    word: string
   ) => {
     try {
-      await gameService.startRound(roomCode, roundNumber, drawerId, word, category);
+      await gameService.startRound(roomCode, roundNumber, drawerId, word);
     } catch (error) {
       console.error('라운드 시작 실패:', error);
       throw error;
