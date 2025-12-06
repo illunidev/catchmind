@@ -53,9 +53,16 @@ export class CanvasService {
    */
   async undo(roomCode: string): Promise<void> {
     const canvas = await this.getCanvasState(roomCode);
-    if (!canvas || canvas.strokes.length === 0) return;
+    if (!canvas) return;
 
-    const newStrokes = canvas.strokes.slice(0, -1);
+    // strokes가 객체일 경우 배열로 변환
+    const strokeArray = Array.isArray(canvas.strokes)
+      ? canvas.strokes
+      : Object.values(canvas.strokes);
+
+    if (strokeArray.length === 0) return;
+
+    const newStrokes = strokeArray.slice(0, -1);
     await setData(`canvases/${roomCode}`, {
       strokes: newStrokes,
       lastUpdated: Date.now(),

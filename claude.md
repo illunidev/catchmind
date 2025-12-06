@@ -4,103 +4,56 @@
 실시간 그림 추측 게임 (Catchmind/Skribbl.io 스타일)
 
 ## 기술 스택
-
-### Frontend & Backend
 - **Framework**: Next.js (App Router)
 - **Language**: TypeScript
-- **Styling**: TailwindCSS (예상)
-
-### Database & Real-time
+- **Styling**: TailwindCSS
 - **Database**: Firebase Realtime Database
-- **Real-time Communication**: Firebase Realtime Database를 통한 실시간 동기화
 
-## 프로젝트 구조 (간략)
+## 프로젝트 구조
 ```
 catchmind/
-├── app/              # 자세한 구조 및 아키텍처는 [project-structure.md](project-structure.md) 참조
-├── components/       # React 컴포넌트 (game/, lobby/, shared/)
+├── app/                    # Next.js App Router 페이지
+│   ├── page.tsx            # 홈 (닉네임 입력)
+│   └── room/[code]/        # 동적 라우팅 (방 코드)
+│       ├── page.tsx        # 방 진입점 (리다이렉션)
+│       ├── waiting/        # 대기실
+│       ├── playing/        # 게임 진행
+│       └── finished/       # 게임 종료
+├── components/             # React 컴포넌트 (game/, shared/)
 ├── lib/
-│   ├── domains/     # 도메인별 로직 (user, room, game, canvas, chat, answer, word)
-│   ├── firebase/    # Firebase 설정
-│   └── utils/       # 유틸리티
-├── types/            # TypeScript 타입
-└── public/           # 정적 파일
+│   ├── domains/            # 도메인별 로직 (user, room, game, canvas, chat, answer, word)
+│   ├── firebase/           # Firebase 설정 및 유틸
+│   └── utils/              # 공통 유틸리티
+└── types/                  # TypeScript 타입 정의
 ```
-
 
 ## 주요 문서
+- [catchmind-spec.md](catchmind-spec.md): 전체 기획서
 - [features.md](features.md): 상세 기능 명세서
-- [domain-model.md](domain-model.md): 도메인 모델 및 엔티티 정의
 - [use-cases.md](use-cases.md): 유스케이스 시나리오
-- [catchmind-spec.md](catchmind-spec.md): 전체 기획서 (기술 스택 중립적)
-- [firebase-database-structure.md](firebase-database-structure.md): Firebase Realtime Database 구조 및 보안 규칙
-- [project-structure.md](project-structure.md): 프로젝트 폴더 구조 및 아키텍처
+- [domain-model.md](domain-model.md): 도메인 모델 정의
+- [firebase-database-structure.md](firebase-database-structure.md): Firebase DB 구조 및 보안 규칙
 
 ## 개발 가이드라인
- - 애매한 경우 항상 물어봐줘
- - SOLID원칙을 모두 준수 해줘
- - 중복되는 내용이 없게 해줘
- - 필드에 null 또는 undefind 를 허용하지 않는것 데이터들은 자신이 만들어질때 유효성검사를 미리 해줘
 
-### 도메인별 문서화 규칙
-각 도메인 폴더(`lib/domains/{domain}/`)에는 **README.md** 파일을 두고 다음 내용을 포함:
-- 도메인 책임 및 역할
-- 주요 서비스/Hook 설명
-- Use Case 매핑 (어떤 UC를 담당하는지)
-- 타입 정의 설명
-- 사용 예시
-
-**자동 참조 규칙:**
-- 도메인 수정 시 해당 도메인의 README.md 자동 업데이트
-- Use Case 변경 시 관련 도메인 README.md 참조 및 업데이트
-- 새 도메인 추가 시 README.md 템플릿 자동 생성
-
-**도메인 README 경로:**
-```
-lib/domains/user/README.md
-lib/domains/room/README.md
-lib/domains/game/README.md
-lib/domains/canvas/README.md
-lib/domains/chat/README.md
-lib/domains/answer/README.md
-lib/domains/word/README.md
-```
+### 기본 원칙
+- 애매한 경우 항상 물어보기
+- SOLID 원칙 준수
+- 코드 중복 최소화
+- 필수 필드는 생성 시 유효성 검사
+- **반복되는 이슈 발견 시**:
+  - 근본 원인 분석 후 해당 섹션에 구체적인 예시와 함께 주의사항 추가
+  - 예: "Firebase 배열 처리" 섹션처럼 실제 코드 예시 포함
 
 ### 코딩 컨벤션
-- TypeScript strict mode 사용
-- 함수형 컴포넌트 및 React Hooks 사용
+- TypeScript strict mode
+- 함수형 컴포넌트 및 React Hooks
 - ESLint 및 Prettier 설정 준수
 
-### Firebase 사용 시 주의사항
-- 환경변수(.env.local)에 Firebase 설정 저장
+### Firebase 주의사항
+- **배열 처리**: Firebase는 배열을 객체로 저장하므로, 배열 메서드 사용 전 `Array.isArray` 체크 필요
+  ```typescript
+  const array = Array.isArray(data) ? data : Object.values(data);
+  ```
 - 실시간 리스너는 컴포넌트 언마운트 시 정리 필수
-- 보안 규칙 설정 필수
-
-### Git 워크플로우
-- main 브랜치: 안정 버전
-- feature/* 브랜치: 새 기능 개발
-- 커밋 메시지는 명확하고 간결하게
-
-## 환경 설정
-```bash
-# 의존성 설치
-npm install
-
-# 개발 서버 실행
-npm run dev
-
-# 빌드
-npm run build
-```
-
-## 환경 변수
-`.env.local` 파일에 다음 Firebase 설정 필요:
-```
-NEXT_PUBLIC_FIREBASE_API_KEY=
-NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN=
-NEXT_PUBLIC_FIREBASE_DATABASE_URL=
-NEXT_PUBLIC_FIREBASE_PROJECT_ID=
-NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET=
-NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID=
-NEXT_PUBLIC_FIREBASE_APP_ID=
-```
+- 환경변수(.env.local)에 Firebase 설정 저장

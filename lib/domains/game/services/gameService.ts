@@ -8,6 +8,7 @@ import { Player } from '@/types/room';
 import { setData, updateData, getData, removeData } from '@/lib/firebase/database';
 import { GAME_CONSTANTS, SCORE_CONSTANTS } from '@/lib/utils/constants';
 import { calculateRoundScore, shuffle } from '@/lib/utils/helpers';
+import { canvasService } from '../../canvas/services/canvasService';
 
 export class GameService {
   /**
@@ -117,6 +118,20 @@ export class GameService {
     // 게임 상태를 대기로 변경
     await updateData(`gameStates/${roomCode}`, {
       status: 'waiting' as GamePhase,
+    });
+  }
+
+  /**
+   * 다음 라운드로 진행
+   */
+  async startNextRound(roomCode: string, nextRoundNumber: number): Promise<void> {
+    // 캔버스 초기화
+    await canvasService.clearCanvas(roomCode);
+
+    // 다음 라운드로 상태 업데이트
+    await updateData(`gameStates/${roomCode}`, {
+      status: 'drawing' as GamePhase,
+      currentRound: nextRoundNumber,
     });
   }
 
