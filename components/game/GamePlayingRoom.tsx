@@ -65,7 +65,7 @@ export function GamePlayingRoom({
 
       {/* 플레이어 목록 - 모바일에서 최하단, 데스크톱에서 왼쪽 */}
       <div className="lg:col-span-1 lg:order-1">
-        <PlayerList players={players} currentDrawerId={currentRound?.drawerId} />
+        <PlayerList players={players} currentDrawerId={currentRound?.drawerId} currentUserId={userId} />
       </div>
     </div>
   );

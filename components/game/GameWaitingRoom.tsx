@@ -12,12 +12,14 @@ import { Button } from '../shared/Button';
 interface GameWaitingRoomProps {
   players: Player[];
   isHost: boolean;
+  currentUserId?: string;
   onStartGame: () => void;
 }
 
 export function GameWaitingRoom({
   players,
   isHost,
+  currentUserId,
   onStartGame,
 }: GameWaitingRoomProps) {
   const canStartGame = players.length >= 2;
@@ -51,7 +53,7 @@ export function GameWaitingRoom({
       </div>
       {/* 플레이어 목록 */}
       <div className="order-2 lg:order-2">
-        <PlayerList players={players} />
+        <PlayerList players={players} currentUserId={currentUserId} />
       </div>
     </div>
   );

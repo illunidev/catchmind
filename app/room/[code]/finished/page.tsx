@@ -87,6 +87,7 @@ export default function FinishedRoomPage() {
         <GameFinishedRoom
           players={players}
           isHost={isHost}
+          currentUserId={user.id}
           onBackToLobby={handleBackToLobby}
         />
       </div>

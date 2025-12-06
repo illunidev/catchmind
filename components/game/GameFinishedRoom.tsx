@@ -12,12 +12,14 @@ import { Button } from '../shared/Button';
 interface GameFinishedRoomProps {
   players: Player[];
   isHost: boolean;
+  currentUserId?: string;
   onBackToLobby: () => void;
 }
 
 export function GameFinishedRoom({
   players,
   isHost,
+  currentUserId,
   onBackToLobby,
 }: GameFinishedRoomProps) {
   return (
@@ -26,7 +28,7 @@ export function GameFinishedRoom({
         게임 종료!
       </h2>
       <div className="mb-4 sm:mb-8">
-        <PlayerList players={players} />
+        <PlayerList players={players} currentUserId={currentUserId} />
       </div>
       {isHost && (
         <Button onClick={onBackToLobby} size="lg">

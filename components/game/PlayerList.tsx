@@ -11,11 +11,21 @@ import { Player } from '@/types/room';
 interface PlayerListProps {
   players: Player[];
   currentDrawerId?: string;
+  currentUserId?: string;
 }
 
-export function PlayerList({ players, currentDrawerId }: PlayerListProps) {
+export function PlayerList({ players, currentDrawerId, currentUserId }: PlayerListProps) {
   // 점수 순으로 정렬
   const sortedPlayers = [...players].sort((a, b) => b.score - a.score);
+
+  const getPlayerStyle = (player: Player) => {
+    const isCurrentUser = player.userId === currentUserId;
+
+    if (isCurrentUser) {
+      return 'bg-indigo-50 border-2 border-indigo-400';
+    }
+    return 'bg-gray-50';
+  };
 
   return (
     <div className="bg-white rounded-lg shadow-md p-2 sm:p-4">
@@ -24,13 +34,7 @@ export function PlayerList({ players, currentDrawerId }: PlayerListProps) {
         {sortedPlayers.map((player, index) => (
           <div
             key={player.userId}
-            className={`flex items-center justify-between p-2 sm:p-3 rounded-lg ${
-              player.userId === currentDrawerId
-                ? 'bg-blue-100 border-2 border-blue-500'
-                : player.status === 'answered'
-                ? 'bg-green-50'
-                : 'bg-gray-50'
-            }`}
+            className={`flex items-center justify-between p-2 sm:p-3 rounded-lg ${getPlayerStyle(player)}`}
           >
             <div className="flex items-center gap-2 sm:gap-3 min-w-0">
               {/* 순위 */}
@@ -42,6 +46,9 @@ export function PlayerList({ players, currentDrawerId }: PlayerListProps) {
               <div className="min-w-0">
                 <p className="font-semibold text-gray-900 text-sm sm:text-base truncate">
                   {player.nickname}
+                  {player.userId === currentUserId && (
+                    <span className="ml-1 text-[10px] sm:text-xs text-indigo-600">(나)</span>
+                  )}
                   {player.isHost && (
                     <span className="ml-1 sm:ml-2 text-[10px] sm:text-xs bg-yellow-400 text-yellow-900 px-1.5 py-0.5 sm:px-2 sm:py-1 rounded">
                       HOST

@@ -101,6 +101,7 @@ export default function WaitingRoomPage() {
         <GameWaitingRoom
           players={players}
           isHost={isHost}
+          currentUserId={user.id}
           onStartGame={handleStartGame}
         />
       </div>
