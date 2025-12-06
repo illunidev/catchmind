@@ -21,11 +21,11 @@ export function GameFinishedRoom({
   onBackToLobby,
 }: GameFinishedRoomProps) {
   return (
-    <div className="bg-white rounded-lg shadow-md p-8 text-center">
-      <h2 className="text-3xl font-bold text-gray-900 mb-8">
+    <div className="bg-white rounded-lg shadow-md p-4 sm:p-8 text-center">
+      <h2 className="text-xl sm:text-3xl font-bold text-gray-900 mb-4 sm:mb-8">
         게임 종료!
       </h2>
-      <div className="mb-8">
+      <div className="mb-4 sm:mb-8">
         <PlayerList players={players} />
       </div>
       {isHost && (

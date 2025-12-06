@@ -17,33 +17,33 @@ interface RoomListProps {
 export function RoomList({ rooms, onJoinRoom }: RoomListProps) {
   if (rooms.length === 0) {
     return (
-      <div className="text-center py-12">
-        <p className="text-gray-500 text-lg">현재 참가 가능한 방이 없습니다.</p>
-        <p className="text-gray-400 text-sm mt-2">새로운 방을 만들어보세요!</p>
+      <div className="text-center py-8 sm:py-12">
+        <p className="text-gray-500 text-base sm:text-lg">현재 참가 가능한 방이 없습니다.</p>
+        <p className="text-gray-400 text-xs sm:text-sm mt-2">새로운 방을 만들어보세요!</p>
       </div>
     );
   }
 
   return (
-    <div className="space-y-3">
+    <div className="space-y-2 sm:space-y-3">
       {rooms.map((room) => (
         <div
           key={room.id}
-          className="bg-white rounded-lg shadow p-4 hover:shadow-md transition-shadow border border-gray-200"
+          className="bg-white rounded-lg shadow p-3 sm:p-4 hover:shadow-md transition-shadow border border-gray-200"
         >
-          <div className="flex items-center justify-between">
-            <div className="flex-1">
-              <div className="flex items-center gap-3">
-                <h3 className="text-lg font-bold text-gray-900">{room.title}</h3>
-                <span className="px-2 py-1 bg-blue-100 text-blue-700 text-xs font-medium rounded">
+          <div className="flex items-center justify-between gap-2">
+            <div className="flex-1 min-w-0">
+              <div className="flex items-center gap-2 sm:gap-3 flex-wrap">
+                <h3 className="text-base sm:text-lg font-bold text-gray-900 truncate">{room.title}</h3>
+                <span className="px-1.5 py-0.5 sm:px-2 sm:py-1 bg-blue-100 text-blue-700 text-[10px] sm:text-xs font-medium rounded flex-shrink-0">
                   {room.code}
                 </span>
               </div>
 
-              <div className="flex items-center gap-4 mt-2 text-sm text-gray-600">
+              <div className="flex items-center gap-2 sm:gap-4 mt-1.5 sm:mt-2 text-xs sm:text-sm text-gray-600 flex-wrap">
                 <div className="flex items-center gap-1">
                   <svg
-                    className="w-4 h-4"
+                    className="w-3.5 h-3.5 sm:w-4 sm:h-4"
                     fill="none"
                     stroke="currentColor"
                     viewBox="0 0 24 24"
@@ -61,13 +61,13 @@ export function RoomList({ rooms, onJoinRoom }: RoomListProps) {
                 </div>
 
                 {room.settings.category && (
-                  <span className="px-2 py-0.5 bg-gray-100 text-gray-700 text-xs rounded">
+                  <span className="px-1.5 py-0.5 bg-gray-100 text-gray-700 text-[10px] sm:text-xs rounded">
                     {getCategoryName(room.settings.category)}
                   </span>
                 )}
 
                 {room.settings.difficulty && (
-                  <span className="px-2 py-0.5 bg-gray-100 text-gray-700 text-xs rounded">
+                  <span className="px-1.5 py-0.5 bg-gray-100 text-gray-700 text-[10px] sm:text-xs rounded">
                     {getDifficultyName(room.settings.difficulty)}
                   </span>
                 )}

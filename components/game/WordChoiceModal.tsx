@@ -61,28 +61,28 @@ export function WordChoiceModal({
 
   return (
     <Modal isOpen={isOpen} onClose={() => {}} title="단어를 선택하세요">
-      <div className="space-y-6">
+      <div className="space-y-4 sm:space-y-6">
         {/* 타이머 */}
         <div className="text-center">
-          <div className="inline-block bg-blue-100 rounded-full px-6 py-3">
-            <span className="text-3xl font-bold text-blue-600">{timeLeft}</span>
-            <span className="text-sm text-blue-600 ml-2">초</span>
+          <div className="inline-block bg-blue-100 rounded-full px-4 py-2 sm:px-6 sm:py-3">
+            <span className="text-2xl sm:text-3xl font-bold text-blue-600">{timeLeft}</span>
+            <span className="text-xs sm:text-sm text-blue-600 ml-1.5 sm:ml-2">초</span>
           </div>
-          <p className="text-sm text-gray-500 mt-2">
+          <p className="text-xs sm:text-sm text-gray-500 mt-2">
             시간 내에 선택하지 않으면 자동으로 선택됩니다
           </p>
         </div>
 
         {/* 단어 선택지 */}
-        <div className="grid grid-cols-1 gap-4">
+        <div className="grid grid-cols-1 gap-2 sm:gap-4">
           {choices.map((choice, index) => (
             <button
               key={choice.id}
               onClick={() => onSelect(choice.text)}
-              className="group relative p-6 bg-white border-2 border-gray-300 rounded-lg hover:border-blue-500 hover:bg-blue-50 transition-all duration-200 transform hover:scale-105"
+              className="group relative p-4 sm:p-6 bg-white border-2 border-gray-300 rounded-lg hover:border-blue-500 hover:bg-blue-50 transition-all duration-200 transform hover:scale-105 active:scale-95"
             >
               <div className="text-center">
-                <p className="text-3xl font-bold text-gray-900 mb-2">
+                <p className="text-xl sm:text-3xl font-bold text-gray-900">
                   {choice.text}
                 </p>
               </div>
@@ -91,8 +91,8 @@ export function WordChoiceModal({
           ))}
         </div>
 
-        {/* 키보드 단축키 안내 */}
-        <div className="text-center text-xs text-gray-400">
+        {/* 키보드 단축키 안내 - 데스크톱에서만 표시 */}
+        <div className="hidden sm:block text-center text-xs text-gray-400">
           <p>단축키: 1, 2, 3 키로 빠르게 선택할 수 있습니다</p>
         </div>
       </div>

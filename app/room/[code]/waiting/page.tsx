@@ -88,8 +88,8 @@ export default function WaitingRoomPage() {
   };
 
   return (
-    <main className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 p-8">
-      <div className="max-w-7xl mx-auto space-y-4">
+    <main className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 p-4 sm:p-6 lg:p-8">
+      <div className="max-w-7xl mx-auto space-y-3 sm:space-y-4">
         <RoomHeader room={room} onLeave={handleLeaveRoom} />
 
         {error && (

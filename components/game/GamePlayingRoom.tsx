@@ -33,27 +33,26 @@ export function GamePlayingRoom({
   onAnswerSubmit,
 }: GamePlayingRoomProps) {
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-4 gap-4">
-      {/* 왼쪽: 플레이어 목록 */}
-      <div className="lg:col-span-1">
-        <PlayerList players={players} currentDrawerId={currentRound?.drawerId} />
-      </div>
-
-      {/* 가운데: 캔버스 */}
-      <div className="lg:col-span-2 space-y-4">
+    <div className="flex flex-col lg:grid lg:grid-cols-4 gap-2 sm:gap-4">
+      {/* 게임 정보 - 모바일에서 최상단 */}
+      <div className="lg:col-span-2 lg:order-2">
         <GameInfo
           gameState={gameState}
           currentRound={currentRound}
           isDrawer={isDrawer}
         />
+      </div>
+
+      {/* 캔버스 - 모바일에서 두번째 */}
+      <div className="lg:col-span-2 lg:order-2">
         {gameState.status === 'drawing' && (
           <Canvas roomCode={roomCode} isDrawer={isDrawer} />
         )}
       </div>
 
-      {/* 오른쪽: 채팅 */}
-      <div className="lg:col-span-1">
-        <div className="h-[700px]">
+      {/* 채팅 - 모바일에서 세번째 */}
+      <div className="lg:col-span-1 lg:order-3">
+        <div className="h-[300px] sm:h-[400px] lg:h-[600px]">
           <ChatBox
             roomCode={roomCode}
             userId={userId}
@@ -62,6 +61,11 @@ export function GamePlayingRoom({
             onAnswerSubmit={onAnswerSubmit}
           />
         </div>
+      </div>
+
+      {/* 플레이어 목록 - 모바일에서 최하단, 데스크톱에서 왼쪽 */}
+      <div className="lg:col-span-1 lg:order-1">
+        <PlayerList players={players} currentDrawerId={currentRound?.drawerId} />
       </div>
     </div>
   );

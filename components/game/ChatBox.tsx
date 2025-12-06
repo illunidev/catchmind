@@ -70,12 +70,12 @@ export function ChatBox({
   return (
     <div className="flex flex-col h-full bg-white rounded-lg shadow-md">
       {/* 채팅 헤더 */}
-      <div className="p-4 border-b border-gray-200">
-        <h3 className="text-lg font-semibold text-gray-900">채팅</h3>
+      <div className="p-2 sm:p-4 border-b border-gray-200">
+        <h3 className="text-base sm:text-lg font-semibold text-gray-900">채팅</h3>
       </div>
 
       {/* 메시지 목록 */}
-      <div className="flex-1 overflow-y-auto p-4 space-y-2">
+      <div className="flex-1 overflow-y-auto p-2 sm:p-4 space-y-1.5 sm:space-y-2">
         {messages.map((message) => (
           <div
             key={message.id}
@@ -97,8 +97,8 @@ export function ChatBox({
       </div>
 
       {/* 입력 폼 */}
-      <div className="p-4 border-t border-gray-200">
-        <form onSubmit={handleSubmit} className="flex gap-2">
+      <div className="p-2 sm:p-4 border-t border-gray-200">
+        <form onSubmit={handleSubmit} className="flex gap-1.5 sm:gap-2">
           <input
             type="text"
             value={input}
@@ -108,13 +108,13 @@ export function ChatBox({
                 ? '채팅을 입력하세요...'
                 : '정답을 입력하세요...'
             }
-            className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="flex-1 px-3 py-2 sm:px-4 text-sm sm:text-base border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
             disabled={!roomCode}
           />
           <button
             type="submit"
             disabled={!input.trim()}
-            className="px-6 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 disabled:bg-gray-300 disabled:cursor-not-allowed"
+            className="px-4 py-2 sm:px-6 text-sm sm:text-base bg-blue-500 text-white rounded-lg hover:bg-blue-600 disabled:bg-gray-300 disabled:cursor-not-allowed"
           >
             전송
           </button>

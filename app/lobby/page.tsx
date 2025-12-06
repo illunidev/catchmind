@@ -106,12 +106,12 @@ export default function LobbyPage() {
   }
 
   return (
-    <main className="min-h-screen p-8 bg-gradient-to-br from-blue-50 to-indigo-100">
+    <main className="min-h-screen p-4 sm:p-6 lg:p-8 bg-gradient-to-br from-blue-50 to-indigo-100">
       <div className="max-w-6xl mx-auto">
         {/* 헤더 */}
-        <div className="text-center mb-8">
-          <h1 className="text-5xl font-bold text-gray-900 mb-4">Catchmind</h1>
-          <p className="text-xl text-gray-600 mb-2">안녕하세요, {user.nickname}님!</p>
+        <div className="text-center mb-4 sm:mb-8">
+          <h1 className="text-3xl sm:text-5xl font-bold text-gray-900 mb-2 sm:mb-4">Catchmind</h1>
+          <p className="text-base sm:text-xl text-gray-600 mb-1 sm:mb-2">안녕하세요, {user.nickname}님!</p>
           <button
             onClick={logout}
             className="text-sm text-gray-500 hover:text-gray-700 underline"
@@ -120,15 +120,15 @@ export default function LobbyPage() {
           </button>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          {/* 왼쪽: 방 만들기/참가 버튼 */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6">
+          {/* 상단(모바일)/왼쪽(데스크톱): 방 만들기/참가 버튼 */}
           <div className="lg:col-span-1">
-            <div className="bg-white rounded-xl shadow-lg p-6 sticky top-8">
-              <h2 className="text-xl font-bold text-gray-900 mb-4">시작하기</h2>
-              <div className="space-y-3">
+            <div className="bg-white rounded-xl shadow-lg p-4 sm:p-6 lg:sticky lg:top-8">
+              <h2 className="text-lg sm:text-xl font-bold text-gray-900 mb-3 sm:mb-4">시작하기</h2>
+              <div className="flex sm:flex-col gap-2 sm:gap-3">
                 <Button
                   onClick={() => setShowCreateModal(true)}
-                  className="w-full"
+                  className="flex-1 sm:w-full"
                   size="lg"
                 >
                   방 만들기
@@ -137,7 +137,7 @@ export default function LobbyPage() {
                 <Button
                   onClick={() => setShowJoinModal(true)}
                   variant="secondary"
-                  className="w-full"
+                  className="flex-1 sm:w-full"
                   size="lg"
                 >
                   코드로 참가
@@ -145,23 +145,23 @@ export default function LobbyPage() {
               </div>
 
               {error && (
-                <p className="mt-4 text-sm text-red-600 text-center">{error}</p>
+                <p className="mt-3 sm:mt-4 text-sm text-red-600 text-center">{error}</p>
               )}
             </div>
           </div>
 
-          {/* 오른쪽: 방 목록 */}
+          {/* 하단(모바일)/오른쪽(데스크톱): 방 목록 */}
           <div className="lg:col-span-2">
-            <div className="bg-white rounded-xl shadow-lg p-6">
-              <div className="flex items-center justify-between mb-4">
-                <h2 className="text-xl font-bold text-gray-900">방 목록</h2>
-                <span className="text-sm text-gray-500">
+            <div className="bg-white rounded-xl shadow-lg p-4 sm:p-6">
+              <div className="flex items-center justify-between mb-3 sm:mb-4">
+                <h2 className="text-lg sm:text-xl font-bold text-gray-900">방 목록</h2>
+                <span className="text-xs sm:text-sm text-gray-500">
                   {rooms.length}개의 방
                 </span>
               </div>
 
               {roomsLoading ? (
-                <div className="flex items-center justify-center py-12">
+                <div className="flex items-center justify-center py-8 sm:py-12">
                   <Loading text="방 목록 불러오는 중..." />
                 </div>
               ) : (

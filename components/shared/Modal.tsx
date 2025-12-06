@@ -46,10 +46,10 @@ export function Modal({
       />
 
       {/* Modal */}
-      <div className="relative bg-white rounded-lg shadow-xl max-w-md w-full mx-4 p-6">
+      <div className="relative bg-white rounded-lg shadow-xl max-w-md w-full mx-3 sm:mx-4 p-4 sm:p-6">
         {/* Header */}
-        <div className="flex items-center justify-between mb-4">
-          <h2 className="text-xl font-bold text-gray-900">{title}</h2>
+        <div className="flex items-center justify-between mb-3 sm:mb-4">
+          <h2 className="text-lg sm:text-xl font-bold text-gray-900">{title}</h2>
           {showCloseButton && (
             <button
               onClick={onClose}

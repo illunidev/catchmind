@@ -5,7 +5,7 @@
 
 'use client';
 
-import React, { useEffect } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { useCanvas } from '@/lib/domains/canvas/hooks/useCanvas';
 
 interface CanvasProps {
@@ -13,6 +13,7 @@ interface CanvasProps {
   isDrawer: boolean;
 }
 
+// 캔버스 내부 해상도 (고정, 비율 4:3)
 const CANVAS_WIDTH = 800;
 const CANVAS_HEIGHT = 600;
 
@@ -32,18 +33,41 @@ export function Canvas({ roomCode, isDrawer }: CanvasProps) {
     undo,
   } = useCanvas({ roomCode, isDrawer });
 
+  // 반응형 캔버스 크기
+  const containerRef = useRef<HTMLDivElement>(null);
+  const [canvasScale, setCanvasScale] = useState(1);
+
+  useEffect(() => {
+    const updateScale = () => {
+      if (!containerRef.current) return;
+      const containerWidth = containerRef.current.clientWidth;
+      // 컨테이너 너비에 맞게 스케일 조정 (최대 1)
+      const scale = Math.min(containerWidth / CANVAS_WIDTH, 1);
+      setCanvasScale(scale);
+    };
+
+    updateScale();
+    window.addEventListener('resize', updateScale);
+    return () => window.removeEventListener('resize', updateScale);
+  }, []);
+
   const handleMouseDown = (e: React.MouseEvent<HTMLCanvasElement>) => {
     if (!isDrawer) return;
     const rect = canvasRef.current?.getBoundingClientRect();
     if (!rect) return;
-    startDrawing(e.clientX - rect.left, e.clientY - rect.top);
+    // 스케일 반영하여 실제 캔버스 좌표 계산
+    const x = (e.clientX - rect.left) / canvasScale;
+    const y = (e.clientY - rect.top) / canvasScale;
+    startDrawing(x, y);
   };
 
   const handleMouseMove = (e: React.MouseEvent<HTMLCanvasElement>) => {
     if (!isDrawer) return;
     const rect = canvasRef.current?.getBoundingClientRect();
     if (!rect) return;
-    draw(e.clientX - rect.left, e.clientY - rect.top);
+    const x = (e.clientX - rect.left) / canvasScale;
+    const y = (e.clientY - rect.top) / canvasScale;
+    draw(x, y);
   };
 
   const handleMouseUp = () => {
@@ -63,7 +87,9 @@ export function Canvas({ roomCode, isDrawer }: CanvasProps) {
     const rect = canvasRef.current?.getBoundingClientRect();
     if (!rect) return;
     const touch = e.touches[0];
-    startDrawing(touch.clientX - rect.left, touch.clientY - rect.top);
+    const x = (touch.clientX - rect.left) / canvasScale;
+    const y = (touch.clientY - rect.top) / canvasScale;
+    startDrawing(x, y);
   };
 
   const handleTouchMove = (e: React.TouchEvent<HTMLCanvasElement>) => {
@@ -72,7 +98,9 @@ export function Canvas({ roomCode, isDrawer }: CanvasProps) {
     const rect = canvasRef.current?.getBoundingClientRect();
     if (!rect) return;
     const touch = e.touches[0];
-    draw(touch.clientX - rect.left, touch.clientY - rect.top);
+    const x = (touch.clientX - rect.left) / canvasScale;
+    const y = (touch.clientY - rect.top) / canvasScale;
+    draw(x, y);
   };
 
   const handleTouchEnd = () => {
@@ -81,15 +109,15 @@ export function Canvas({ roomCode, isDrawer }: CanvasProps) {
   };
 
   return (
-    <div className="flex flex-col items-center space-y-4">
+    <div ref={containerRef} className="flex flex-col items-center space-y-2 sm:space-y-4 w-full">
       {/* 툴바 */}
       {isDrawer && (
-        <div className="flex items-center gap-4 bg-white p-4 rounded-lg shadow-md">
+        <div className="flex flex-wrap items-center justify-center gap-2 sm:gap-4 bg-white p-2 sm:p-4 rounded-lg shadow-md w-full">
           {/* 도구 선택 */}
-          <div className="flex gap-2">
+          <div className="flex gap-1 sm:gap-2">
             <button
               onClick={() => setTool('pen')}
-              className={`px-4 py-2 rounded ${
+              className={`px-3 py-1.5 sm:px-4 sm:py-2 text-sm sm:text-base rounded ${
                 tool === 'pen'
                   ? 'bg-blue-500 text-white'
                   : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
@@ -99,7 +127,7 @@ export function Canvas({ roomCode, isDrawer }: CanvasProps) {
             </button>
             <button
               onClick={() => setTool('eraser')}
-              className={`px-4 py-2 rounded ${
+              className={`px-3 py-1.5 sm:px-4 sm:py-2 text-sm sm:text-base rounded ${
                 tool === 'eraser'
                   ? 'bg-blue-500 text-white'
                   : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
@@ -111,13 +139,12 @@ export function Canvas({ roomCode, isDrawer }: CanvasProps) {
 
           {/* 색상 선택 */}
           {tool === 'pen' && (
-            <div className="flex items-center gap-2">
-              <span className="text-sm text-gray-700">색상:</span>
+            <div className="flex items-center gap-1 sm:gap-2">
               <input
                 type="color"
                 value={color}
                 onChange={(e) => setColor(e.target.value)}
-                className="w-10 h-10 cursor-pointer rounded border border-gray-300"
+                className="w-8 h-8 sm:w-10 sm:h-10 cursor-pointer rounded border border-gray-300"
               />
               {/* 기본 색상 팔레트 */}
               <div className="flex gap-1">
@@ -125,7 +152,7 @@ export function Canvas({ roomCode, isDrawer }: CanvasProps) {
                   <button
                     key={c}
                     onClick={() => setColor(c)}
-                    className="w-6 h-6 rounded border border-gray-300"
+                    className="w-6 h-6 sm:w-7 sm:h-7 rounded border border-gray-300"
                     style={{ backgroundColor: c }}
                   />
                 ))}
@@ -134,39 +161,38 @@ export function Canvas({ roomCode, isDrawer }: CanvasProps) {
           )}
 
           {/* 선 두께 */}
-          <div className="flex items-center gap-2">
-            <span className="text-sm text-gray-700">두께:</span>
+          <div className="flex items-center gap-1 sm:gap-2">
             <input
               type="range"
               min="1"
               max="20"
               value={lineWidth}
               onChange={(e) => setLineWidth(Number(e.target.value))}
-              className="w-24"
+              className="w-16 sm:w-24"
             />
-            <span className="text-sm text-gray-700 w-8">{lineWidth}</span>
+            <span className="text-xs sm:text-sm text-gray-700 w-6">{lineWidth}</span>
           </div>
 
           {/* 액션 버튼 */}
-          <div className="flex gap-2 ml-auto">
+          <div className="flex gap-1 sm:gap-2">
             <button
               onClick={undo}
-              className="px-4 py-2 bg-yellow-500 text-white rounded hover:bg-yellow-600"
+              className="px-2 py-1.5 sm:px-4 sm:py-2 text-xs sm:text-sm bg-yellow-500 text-white rounded hover:bg-yellow-600"
             >
-              실행 취소
+              취소
             </button>
             <button
               onClick={clearCanvas}
-              className="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600"
+              className="px-2 py-1.5 sm:px-4 sm:py-2 text-xs sm:text-sm bg-red-500 text-white rounded hover:bg-red-600"
             >
-              전체 지우기
+              전체삭제
             </button>
           </div>
         </div>
       )}
 
       {/* 캔버스 */}
-      <div className="relative">
+      <div className="relative w-full flex justify-center">
         <canvas
           ref={canvasRef}
           width={CANVAS_WIDTH}
@@ -178,14 +204,18 @@ export function Canvas({ roomCode, isDrawer }: CanvasProps) {
           onTouchStart={handleTouchStart}
           onTouchMove={handleTouchMove}
           onTouchEnd={handleTouchEnd}
-          className={`border-4 border-gray-300 rounded-lg bg-white ${
+          className={`border-2 sm:border-4 border-gray-300 rounded-lg bg-white ${
             isDrawer ? 'cursor-crosshair' : 'cursor-not-allowed'
           }`}
-          style={{ touchAction: 'none' }}
+          style={{
+            touchAction: 'none',
+            width: CANVAS_WIDTH * canvasScale,
+            height: CANVAS_HEIGHT * canvasScale,
+          }}
         />
         {!isDrawer && (
           <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-            <p className="text-2xl font-bold text-gray-400 bg-white bg-opacity-80 px-4 py-2 rounded">
+            <p className="text-base sm:text-2xl font-bold text-gray-400 bg-white bg-opacity-80 px-3 py-1.5 sm:px-4 sm:py-2 rounded">
               그림을 보고 맞춰보세요!
             </p>
           </div>

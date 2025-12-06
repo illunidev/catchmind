@@ -194,8 +194,8 @@ export default function PlayingRoomPage() {
   };
 
   return (
-    <main className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 p-8">
-      <div className="max-w-7xl mx-auto space-y-4">
+    <main className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 p-2 sm:p-4 lg:p-8">
+      <div className="max-w-7xl mx-auto space-y-2 sm:space-y-4">
         <RoomHeader room={room} onLeave={handleLeaveRoom} />
 
         {error && (

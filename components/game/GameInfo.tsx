@@ -81,18 +81,18 @@ export function GameInfo({ gameState, currentRound, isDrawer }: GameInfoProps) {
   }
 
   return (
-    <div className="bg-white rounded-lg shadow-md p-6">
+    <div className="bg-white rounded-lg shadow-md p-3 sm:p-6">
       {/* 라운드 정보 */}
-      <div className="flex justify-between items-center mb-4">
+      <div className="flex justify-between items-center mb-2 sm:mb-4">
         <div>
-          <h2 className="text-2xl font-bold text-gray-900">
+          <h2 className="text-lg sm:text-2xl font-bold text-gray-900">
             라운드 {gameState.currentRound} / {gameState.totalRounds}
           </h2>
         </div>
 
         {/* 타이머 */}
         {currentRound && gameState.status === 'drawing' && (
-          <div className={`text-4xl font-bold ${getTimerColor()}`}>
+          <div className={`text-2xl sm:text-4xl font-bold ${getTimerColor()}`}>
             {timeLeft}초
           </div>
         )}
@@ -101,7 +101,7 @@ export function GameInfo({ gameState, currentRound, isDrawer }: GameInfoProps) {
       {/* 게임 상태 및 힌트 */}
       <div className="space-y-2">
         {gameState.status === 'waiting' && (
-          <p className="text-lg text-gray-600 text-center py-4">
+          <p className="text-base sm:text-lg text-gray-600 text-center py-2 sm:py-4">
             다음 라운드를 준비 중입니다...
           </p>
         )}
@@ -109,16 +109,16 @@ export function GameInfo({ gameState, currentRound, isDrawer }: GameInfoProps) {
         {gameState.status === 'drawing' && currentRound && (
           <>
             {isDrawer ? (
-              <div className="bg-blue-100 border-2 border-blue-500 rounded-lg p-4">
-                <p className="text-sm text-blue-800 mb-2">출제 단어:</p>
-                <p className="text-3xl font-bold text-blue-900">
+              <div className="bg-blue-100 border-2 border-blue-500 rounded-lg p-3 sm:p-4">
+                <p className="text-xs sm:text-sm text-blue-800 mb-1 sm:mb-2">출제 단어:</p>
+                <p className="text-xl sm:text-3xl font-bold text-blue-900">
                   {currentRound.word}
                 </p>
               </div>
             ) : (
-              <div className="bg-gray-100 rounded-lg p-4">
-                <p className="text-sm text-gray-600 mb-2">힌트:</p>
-                <p className="text-2xl font-mono text-gray-900">
+              <div className="bg-gray-100 rounded-lg p-3 sm:p-4">
+                <p className="text-xs sm:text-sm text-gray-600 mb-1 sm:mb-2">힌트:</p>
+                <p className="text-lg sm:text-2xl font-mono text-gray-900">
                   {getHint()}
                 </p>
               </div>
@@ -127,7 +127,7 @@ export function GameInfo({ gameState, currentRound, isDrawer }: GameInfoProps) {
         )}
 
         {gameState.status === 'finished' && (
-          <p className="text-lg text-gray-600 text-center py-4">
+          <p className="text-base sm:text-lg text-gray-600 text-center py-2 sm:py-4">
             게임이 종료되었습니다!
           </p>
         )}

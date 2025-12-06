@@ -45,21 +45,31 @@ export function RoomHeader({ room, onLeave }: RoomHeaderProps) {
   };
 
   return (
-    <div className="bg-white rounded-lg shadow-md p-6">
-      <div className="flex justify-between items-start">
-        <div>
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">{room.title}</h1>
-          <div className="flex gap-4 text-sm text-gray-600">
-            <span className="bg-blue-100 text-blue-800 px-3 py-1 rounded-full">
-              방 코드: {room.code}
+    <div className="bg-white rounded-lg shadow-md p-3 sm:p-6">
+      <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-3">
+        <div className="flex-1 min-w-0">
+          <div className="flex items-center justify-between sm:justify-start gap-2 mb-2">
+            <h1 className="text-xl sm:text-3xl font-bold text-gray-900 truncate">
+              {room.title}
+            </h1>
+            <button
+              onClick={handleLeave}
+              className="sm:hidden px-3 py-1.5 text-sm bg-red-500 text-white rounded-lg hover:bg-red-600 flex-shrink-0"
+            >
+              나가기
+            </button>
+          </div>
+          <div className="flex flex-wrap gap-1.5 sm:gap-3 text-xs sm:text-sm">
+            <span className="bg-blue-100 text-blue-800 px-2 py-0.5 sm:px-3 sm:py-1 rounded-full">
+              {room.code}
             </span>
-            <span className="bg-gray-100 text-gray-800 px-3 py-1 rounded-full">
+            <span className="bg-gray-100 text-gray-800 px-2 py-0.5 sm:px-3 sm:py-1 rounded-full">
               {room.currentPlayers}/{room.settings.maxPlayers}명
             </span>
-            <span className="bg-purple-100 text-purple-800 px-3 py-1 rounded-full">
+            <span className="bg-purple-100 text-purple-800 px-2 py-0.5 sm:px-3 sm:py-1 rounded-full">
               {getCategoryName(room.settings.category)}
             </span>
-            <span className="bg-orange-100 text-orange-800 px-3 py-1 rounded-full">
+            <span className="bg-orange-100 text-orange-800 px-2 py-0.5 sm:px-3 sm:py-1 rounded-full">
               {getDifficultyName(room.settings.difficulty)}
             </span>
           </div>
@@ -67,7 +77,7 @@ export function RoomHeader({ room, onLeave }: RoomHeaderProps) {
 
         <button
           onClick={handleLeave}
-          className="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600"
+          className="hidden sm:block px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 flex-shrink-0"
         >
           나가기
         </button>
